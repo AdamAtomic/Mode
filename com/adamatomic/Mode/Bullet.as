@@ -20,8 +20,6 @@ package com.adamatomic.Mode
 			offset.y = 1;
 			exists = false;
 			
-			acceleration.y = 400;
-			
 			addAnimation("up",[0]);
 			addAnimation("down",[1]);
 			addAnimation("left",[2]);
