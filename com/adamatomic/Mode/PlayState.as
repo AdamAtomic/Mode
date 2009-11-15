@@ -156,7 +156,7 @@ package com.adamatomic.Mode
 			FlxG.overlapArray(_botBullets,_player,bulletHitBot);
 			
 			//Jammed message
-			if(FlxG.justPressed(FlxG.B) && _player.flickering())
+			if(FlxG.keys.justPressed("C") && _player.flickering())
 			{
 				_jamTimer = 1;
 				_jamBar.visible = true;

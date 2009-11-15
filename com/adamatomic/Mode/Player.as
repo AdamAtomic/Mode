@@ -71,17 +71,17 @@ package com.adamatomic.Mode
 			
 			//MOVEMENT
 			acceleration.x = 0;
-			if(FlxG.kLeft)
+			if(FlxG.keys.LEFT)
 			{
 				facing = LEFT;
 				acceleration.x -= drag.x;
 			}
-			else if(FlxG.kRight)
+			else if(FlxG.keys.RIGHT)
 			{
 				facing = RIGHT;
 				acceleration.x += drag.x;
 			}
-			if(FlxG.justPressed(FlxG.A) && !velocity.y)
+			if(FlxG.keys.justPressed("X") && !velocity.y)
 			{
 				velocity.y = -_jumpPower;
 				FlxG.play(SndJump);
@@ -90,8 +90,8 @@ package com.adamatomic.Mode
 			//AIMING
 			_up = false;
 			_down = false;
-			if(FlxG.kUp) _up = true;
-			else if(FlxG.kDown && velocity.y) _down = true;
+			if(FlxG.keys.UP) _up = true;
+			else if(FlxG.keys.DOWN && velocity.y) _down = true;
 			
 			//ANIMATION
 			if(velocity.y != 0)
@@ -117,11 +117,11 @@ package com.adamatomic.Mode
 			//SHOOTING
 			if(flickering())
 			{
-				if(FlxG.justPressed(FlxG.B))
+				if(FlxG.keys.justPressed("C"))
 					FlxG.play(SndJam);
 				return;
 			}
-			if(FlxG.justPressed(FlxG.B))
+			if(FlxG.keys.justPressed("C"))
 			{
 				var bXVel:int = 0;
 				var bYVel:int = 0;

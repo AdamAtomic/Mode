@@ -26,7 +26,7 @@ package com.adamatomic.Mode
 			if(!_fading)
 			{
 				_timer += FlxG.elapsed;
-				if((_timer > 0.35) && ((_timer > 10) || FlxG.justPressed(FlxG.A) || FlxG.justPressed(FlxG.B)))
+				if((_timer > 0.35) && ((_timer > 10) || FlxG.keys.justPressed("X") || FlxG.keys.justPressed("C")))
 				{
 					_fading = true;
 					FlxG.play(SndMenu);

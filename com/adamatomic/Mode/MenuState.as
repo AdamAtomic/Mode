@@ -36,7 +36,7 @@ package com.adamatomic.Mode
 			_ok = false;
 			_ok2 = false;
 			
-			FlxG.setCursor(ImgCursor);
+			FlxG.showCursor(ImgCursor);
 		}
 
 		override public function update():void
@@ -86,7 +86,7 @@ package com.adamatomic.Mode
 			}
 			
 			//X + C were pressed, fade out and change to play state
-			if(_ok && !_ok2 && FlxG.kA && FlxG.kB)
+			if(_ok && !_ok2 && FlxG.keys.X && FlxG.keys.C)
 			{
 				_ok2 = true;
 				FlxG.play(SndHit2);
