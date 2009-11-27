@@ -65,7 +65,7 @@ package com.adamatomic.Mode
 				FlxG.quake(0.035,0.5);
 				_t1.setColor(0xd8eba2);
 				_t2.setColor(0xd8eba2);
-				_e.reset();
+				_e.restart();
 				_t1.angle = Math.random()*40-20;
 				_t2.angle = Math.random()*40-20;
 				

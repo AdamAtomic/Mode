@@ -22,9 +22,9 @@ package com.adamatomic.Mode
 			else super.update();
 		}
 		
-		override public function hitWall():Boolean { hurt(0); return true; }
-		override public function hitFloor():Boolean { hurt(0); return true; }
-		override public function hitCeiling():Boolean { hurt(0); return true; }
+		override public function hitWall(Contact:FlxCore=null):Boolean { hurt(0); return true; }
+		override public function hitFloor(Contact:FlxCore=null):Boolean { hurt(0); return true; }
+		override public function hitCeiling(Contact:FlxCore=null):Boolean { hurt(0); return true; }
 		override public function hurt(Damage:Number):void
 		{
 			if(dead) return;
@@ -38,14 +38,10 @@ package com.adamatomic.Mode
 		public function shoot(X:int, Y:int, VelocityX:int, VelocityY:int):void
 		{
 			FlxG.play(SndShoot,0.5);
-			x = X;
-			y = Y;
+			super.reset(X,Y);
 			velocity.x = VelocityX;
 			velocity.y = VelocityY;
 			play("idle");
-			dead = false;
-			exists = true;
-			visible = true;
 		}
 	}
 }

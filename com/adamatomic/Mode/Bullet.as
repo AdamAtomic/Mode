@@ -38,9 +38,9 @@ package com.adamatomic.Mode
 			super.render();
 		}
 		
-		override public function hitWall():Boolean { hurt(0); return true; }
-		override public function hitFloor():Boolean { hurt(0); return true; }
-		override public function hitCeiling():Boolean { hurt(0); return true; }
+		override public function hitWall(Contact:FlxCore=null):Boolean { hurt(0); return true; }
+		override public function hitFloor(Contact:FlxCore=null):Boolean { hurt(0); return true; }
+		override public function hitCeiling(Contact:FlxCore=null):Boolean { hurt(0); return true; }
 		override public function hurt(Damage:Number):void
 		{
 			if(dead) return;
@@ -54,8 +54,7 @@ package com.adamatomic.Mode
 		public function shoot(X:int, Y:int, VelocityX:int, VelocityY:int):void
 		{
 			FlxG.play(SndShoot);
-			x = X;
-			y = Y;
+			super.reset(X,Y);
 			velocity.x = VelocityX;
 			velocity.y = VelocityY;
 			if(velocity.y < 0)
@@ -66,9 +65,6 @@ package com.adamatomic.Mode
 				play("left");
 			else if(velocity.x > 0)
 				play("right");
-			dead = false;
-			exists = true;
-			visible = true;
 		}
 	}
 }

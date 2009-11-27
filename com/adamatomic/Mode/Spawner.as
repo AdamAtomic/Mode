@@ -74,7 +74,7 @@ package com.adamatomic.Mode
 			FlxG.flash(0xffd8eba2,0.35);
 			makeBot();
 			_gibs = FlxG.state.add(new FlxEmitter(x+width/2,y+height/2,0,0,null,-2,-200,200,-300,0,-720,720,400,0,ImgSpawnerGibs,50,true)) as FlxEmitter;
-			_gibs.reset();
+			_gibs.restart();
 			FlxG.score += 1000;
 		}
 		

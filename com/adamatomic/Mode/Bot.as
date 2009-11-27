@@ -34,8 +34,8 @@ package com.adamatomic.Mode
 			maxAngular = 120;
 			angularDrag = 400;
 			maxThrust = 100;
-			drag.x = 40;
-			drag.y = 40;
+			drag.x = 80;
+			drag.y = 80;
 			
 			addAnimation("idle", [0]);
 			addAnimation("dead", [1, 2, 3, 4, 5], 15, false);
@@ -59,7 +59,7 @@ package com.adamatomic.Mode
 			var ot:Number = _timer;
 			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
 			_timer += FlxG.elapsed;
-			if((ot < 4) && (_timer >= 4))
+			if((ot < 8) && (_timer >= 8))
 				_jets.kill();
 
 			//Aiming
@@ -80,16 +80,16 @@ package com.adamatomic.Mode
 
 			//Jets
 			thrust = 0;
-			if(_timer > 6)
+			if(_timer > 9)
 				_timer = 0;
-			else if(_timer < 4)
+			else if(_timer < 8)
 			{
 				if(!_jets.active)
-					_jets.reset();
-				thrust = 50;
+					_jets.restart();
+				thrust = 40;
 				_jets.x = x + width/2;
 				_jets.y = y + height/2;
-				var v:Point = FlxG.rotatePoint(50,0,0,0,angle);
+				var v:Point = FlxG.rotatePoint(thrust,0,0,0,angle);
 				_jets.maxVelocity.x = v.x+30;
 				_jets.minVelocity.x = v.x-30;
 				_jets.maxVelocity.y = v.y+30;
@@ -135,18 +135,13 @@ package com.adamatomic.Mode
 			_jets.kill();
 			_gibs.x = x + width/2;
 			_gibs.y = y + height/2;
-			_gibs.reset();
+			_gibs.restart();
 			FlxG.score += 200;
 		}
 		
-		public function reset(X:Number, Y:Number):void
+		override public function reset(X:Number, Y:Number):void
 		{
-			exists = true;
-			dead = false;
-			visible = true;
-			active = true;
-			x = X;
-			y = Y;
+			super.reset(X,Y);
 			thrust = 0;
 			velocity.x = 0;
 			velocity.y = 0;

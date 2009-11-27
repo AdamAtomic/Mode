@@ -146,7 +146,8 @@ package com.adamatomic.Mode
 			FlxG.collideArrays(_blocks,_bullets);
 			FlxG.collideArrays(_blocks,_botBullets);
 			FlxG.collideArrays(_blocks,_bots);
-			FlxG.collideArray(_blocks,_player);
+			FlxG.collideArrayX(_blocks,_player);
+			FlxG.collideArrayY(_blocks,_player);
 			
 			//collisions between sprites
 			FlxG.overlapArrays(_bullets,_bots,bulletHitBot);

@@ -110,18 +110,9 @@ package com.adamatomic.Mode
 				if(_up) play("run_up");
 				else play("run");
 			}
-				
-			//UPDATE POSITION AND ANIMATION
-			super.update();
 			
 			//SHOOTING
-			if(flickering())
-			{
-				if(FlxG.keys.justPressed("C"))
-					FlxG.play(SndJam);
-				return;
-			}
-			if(FlxG.keys.justPressed("C"))
+			if(!flickering() && FlxG.keys.justPressed("C"))
 			{
 				var bXVel:int = 0;
 				var bYVel:int = 0;
@@ -152,9 +143,19 @@ package com.adamatomic.Mode
 				if(++_curBullet >= _bullets.length)
 					_curBullet = 0;
 			}
+				
+			//UPDATE POSITION AND ANIMATION
+			super.update();
+
+			//Jammed, can't fire!
+			if(flickering())
+			{
+				if(FlxG.keys.justPressed("C"))
+					FlxG.play(SndJam);
+			}
 		}
 		
-		override public function hitFloor():Boolean
+		override public function hitFloor(Contact:FlxCore=null):Boolean
 		{
 			if(velocity.y > 50)
 				FlxG.play(SndLand);
@@ -190,7 +191,7 @@ package com.adamatomic.Mode
 			FlxG.flash(0xffd8eba2,0.35);
 			_gibs.x = x + width/2;
 			_gibs.y = y + height/2;
-			_gibs.reset();
+			_gibs.restart();
 		}
 	}
 }
