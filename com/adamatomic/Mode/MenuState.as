@@ -66,8 +66,8 @@ package com.adamatomic.Mode
 				_t1.setColor(0xd8eba2);
 				_t2.setColor(0xd8eba2);
 				_e.restart();
-				_t1.angle = Math.random()*40-20;
-				_t2.angle = Math.random()*40-20;
+				_t1.angle = FlxG.random()*40-20;
+				_t2.angle = FlxG.random()*40-20;
 				
 				this.add(new FlxText(t1m,FlxG.height/3+39,110,20,"by Adam Atomic",0x3a5c39,null,8,"center"));
 				
