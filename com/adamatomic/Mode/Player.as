@@ -24,7 +24,7 @@ package com.adamatomic.Mode
 		
 		public function Player(X:int,Y:int,Bullets:Array)
 		{
-			super(ImgSpaceman,X,Y,true,true);
+			super(ImgSpaceman,X,Y,true,true,8);
 			_restart = 0;
 			
 			//bounding box tweaks
