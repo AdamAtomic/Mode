@@ -14,7 +14,7 @@ package com.adamatomic.Mode
 		[Embed(source="../../../data/jam.mp3")] private var SndJam:Class;
 		
 		private var _jumpPower:int;
-		private var _bullets:FlxArray;
+		private var _bullets:Array;
 		private var _curBullet:uint;
 		private var _bulletVel:int;
 		private var _up:Boolean;
@@ -22,7 +22,7 @@ package com.adamatomic.Mode
 		private var _restart:Number;
 		private var _gibs:FlxEmitter;
 		
-		public function Player(X:int,Y:int,Bullets:FlxArray)
+		public function Player(X:int,Y:int,Bullets:Array)
 		{
 			super(ImgSpaceman,X,Y,true,true);
 			_restart = 0;

@@ -11,17 +11,17 @@ package com.adamatomic.Mode
 		[Embed(source="../../../data/hit.mp3")] private var SndHit:Class;
 		
 		private var _timer:Number;
-		private var _b:FlxArray;
-		private var _b2:FlxArray;
+		private var _b:Array;
+		private var _b2:Array;
 		private var _gibs:FlxEmitter;
-		private var _p:Player;
+		private var _player:Player;
 		
-		public function Spawner(X:int, Y:int,Bots:FlxArray,BotBullets:FlxArray,ThePlayer:Player)
+		public function Spawner(X:int, Y:int,Bots:Array,BotBullets:Array,ThePlayer:Player)
 		{
 			super(ImgSpawner, X, Y, true, false);
 			_b = Bots;
 			_b2 = BotBullets;
-			_p = ThePlayer;
+			_player = ThePlayer;
 			_timer = Math.random()*20;
 			health = 8;
 
@@ -89,10 +89,10 @@ package com.adamatomic.Mode
 				} 
 			
 			//if that fails just make a new one
-			var b:Bot = new Bot(x + width/2, y + width/2,_b2,_p);
+			var b:Bot = new Bot(x + width/2, y + width/2,_b2,_player);
 			b.x -= b.width/2;
 			b.y -= b.height/2;
-			_b.add(FlxG.state.add(b));
+			_b.push(FlxG.state.add(b));
 		}
 	}
 }

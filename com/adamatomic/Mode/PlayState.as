@@ -12,12 +12,12 @@ package com.adamatomic.Mode
 		[Embed(source="../../../data/countdown.mp3")] private var SndCount:Class;
 		
 		//major game objects
-		private var _blocks:FlxArray;
-		private var _bullets:FlxArray;
+		private var _blocks:Array;
+		private var _bullets:Array;
 		private var _player:Player;
-		private var _bots:FlxArray;
-		private var _spawners:FlxArray;
-		private var _botBullets:FlxArray;
+		private var _bots:Array;
+		private var _spawners:Array;
+		private var _botBullets:Array;
 		
 		//HUD
 		private var _score:FlxText;
@@ -28,7 +28,7 @@ package com.adamatomic.Mode
 		private var _jamTimer:Number;
 		private var _jamBar:FlxSprite;
 		private var _jamText:FlxText;
-		private var _notches:FlxArray;
+		private var _notches:Array;
 		
 		//just to prevent weirdness during level transition
 		private var _fading:Boolean;
@@ -38,21 +38,21 @@ package com.adamatomic.Mode
 			super();
 			
 			//create basic objects
-			_bullets = new FlxArray();
+			_bullets = new Array();
 			_player = new Player(316,300,_bullets);
-			_botBullets = new FlxArray();
-			_bots = new FlxArray();
-			_spawners = new FlxArray();
+			_botBullets = new Array();
+			_bots = new Array();
+			_spawners = new Array();
 			
 			//create level
 			var i:uint;
 			var r:uint = 160;
-			_blocks = new FlxArray();
-			_blocks.add(this.add(new FlxBlock(0,0,640,16,ImgTech)));
-			_blocks.add(this.add(new FlxBlock(0,16,16,640-16,ImgTech)));
-			_blocks.add(this.add(new FlxBlock(640-16,16,16,640-16,ImgTech)));
-			_blocks.add(this.add(new FlxBlock(16,640-24,640-32,8,ImgDirtTop)));
-			_blocks.add(this.add(new FlxBlock(16,640-16,640-32,16,ImgDirt)));
+			_blocks = new Array();
+			_blocks.push(this.add(new FlxBlock(0,0,640,16,ImgTech)));
+			_blocks.push(this.add(new FlxBlock(0,16,16,640-16,ImgTech)));
+			_blocks.push(this.add(new FlxBlock(640-16,16,16,640-16,ImgTech)));
+			_blocks.push(this.add(new FlxBlock(16,640-24,640-32,8,ImgDirtTop)));
+			_blocks.push(this.add(new FlxBlock(16,640-16,640-32,16,ImgDirt)));
 			buildRoom(r*0,r*0,true);
 			buildRoom(r*1,r*0);
 			buildRoom(r*2,r*0);
@@ -72,9 +72,9 @@ package com.adamatomic.Mode
 			
 			//create bullets
 			for(i = 0; i < 50; i++)
-				_botBullets.add(this.add(new BotBullet()));
+				_botBullets.push(this.add(new BotBullet()));
 			for(i = 0; i < 8; i++)
-				_bullets.add(this.add(new Bullet()));
+				_bullets.push(this.add(new Bullet()));
 			
 			//camera settings
 			this.add(_player);
@@ -83,9 +83,9 @@ package com.adamatomic.Mode
 			FlxG.followBounds(0,0,640,640);
 			
 			//HUD - score
-			_score = new FlxText(0,0,FlxG.width,40,null,0xd8eba2,null,16,"center");
+			_score = new FlxText(0,0,FlxG.width,null,0xd8eba2,null,16,"center");
 			_score.scrollFactor.x = _score.scrollFactor.y = 0;
-			_scoreShadow = this.add(new FlxText(_score.x+2,_score.y+2,_score.width,_score.height,null,0x131c1b,null,16,"center")) as FlxText;
+			_scoreShadow = this.add(new FlxText(_score.x+2,_score.y+2,_score.width,null,0x131c1b,null,16,"center")) as FlxText;
 			_scoreShadow.scrollFactor.x = _scoreShadow.scrollFactor.y = 0;
 			this.add(_score);
 			if(FlxG.scores.length < 2)
@@ -95,23 +95,23 @@ package com.adamatomic.Mode
 			}
 			
 			//HUD - highest and last scores
-			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2,40,null,0xd8eba2,null,8,"right");
+			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2,null,0xd8eba2,null,8,"right");
 			_score2.scrollFactor.x = _score2.scrollFactor.y = 0;
-			_score2Shadow = this.add(new FlxText(_score2.x+1,_score2.y+1,_score2.width,_score2.height,null,0x131c1b,null,8,"right")) as FlxText;
+			_score2Shadow = this.add(new FlxText(_score2.x+1,_score2.y+1,_score2.width,null,0x131c1b,null,8,"right")) as FlxText;
 			_score2Shadow.scrollFactor.x = _score2Shadow.scrollFactor.y = 0;
 			this.add(_score2);
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
 			if(FlxG.scores[0] != 0)
 			{
-				_score2.setText("HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score);
-				_score2Shadow.setText("HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score);
+				_score2.text = "HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score;
+				_score2Shadow.text = "HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score;
 			}
 			FlxG.score = 0;
 			_scoreTimer = 0;
 			
 			//HUD - the "number of spawns left" icons
-			_notches = new FlxArray();
+			_notches = new Array();
 			var tmp:FlxSprite;
 			for(i = 0; i < 6; i++)
 			{
@@ -120,14 +120,14 @@ package com.adamatomic.Mode
 				tmp.addAnimation("on",[0]);
 				tmp.addAnimation("off",[1]);
 				tmp.play("on");
-				_notches.add(this.add(tmp));
+				_notches.push(this.add(tmp));
 			}
 			
 			//HUD - the "gun jammed" notification
 			_jamBar = this.add(new FlxSprite(null,0,FlxG.height-22,false,false,FlxG.width,24,0xff131c1b)) as FlxSprite;
 			_jamBar.scrollFactor.x = _jamBar.scrollFactor.y = 0;
 			_jamBar.visible = false;
-			_jamText = this.add(new FlxText(0,FlxG.height-22,FlxG.width,20,"GUN IS JAMMED",0xd8eba2,null,16,"center")) as FlxText;
+			_jamText = this.add(new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED",0xd8eba2,null,16,"center")) as FlxText;
 			_jamText.scrollFactor.x = _jamText.scrollFactor.y = 0;
 			_jamText.visible = false;
 			
@@ -226,8 +226,8 @@ package com.adamatomic.Mode
 			if(os != FlxG.score)
 			{
 				if(_player.dead) FlxG.score = 0;
-				_score.setText(FlxG.score.toString());
-				_scoreShadow.setText(FlxG.score.toString());
+				_score.text = FlxG.score.toString();
+				_scoreShadow.text = FlxG.score.toString();
 			}
 		}
 		
@@ -288,7 +288,7 @@ package com.adamatomic.Mode
 					else
 						check = true;
 				} while(!check);
-				_blocks.add(this.add(new FlxBlock(RX+bx*8,RY+by*8,bw*8,bh*8,ImgTech)));
+				_blocks.push(this.add(new FlxBlock(RX+bx*8,RY+by*8,bw*8,bh*8,ImgTech)));
 				
 				//If the block has room, add some non-colliding "dirt" graphics for variety
 				if((bw >= 4) && (bh >= 5))
@@ -300,7 +300,7 @@ package com.adamatomic.Mode
 			
 			//Finally actually add the spawner
 			if(Spawners)
-				_spawners.add(this.add(new Spawner(RX+sx*8,RY+sy*8,_bots,_botBullets,_player)));
+				_spawners.push(this.add(new Spawner(RX+sx*8,RY+sy*8,_bots,_botBullets,_player)));
 		}
 	}
 }

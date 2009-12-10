@@ -15,16 +15,16 @@ package com.adamatomic.Mode
 		
 		private var _gibs:FlxEmitter;
 		private var _jets:FlxEmitter;
-		private var _p:Player;
+		private var _player:Player;
 		private var _timer:Number;
-		private var _b:FlxArray;
+		private var _b:Array;
 		static private var _cb:uint = 0;
 		private var _shotClock:Number;
 		
-		public function Bot(xPos:int,yPos:int,Bullets:FlxArray,ThePlayer:Player)
+		public function Bot(xPos:int,yPos:int,Bullets:Array,ThePlayer:Player)
 		{
 			super(ImgBot,xPos,yPos,true);
-			_p = ThePlayer;
+			_player = ThePlayer;
 			_b = Bullets;
 			
 			width = 12;
@@ -63,8 +63,8 @@ package com.adamatomic.Mode
 				_jets.kill();
 
 			//Aiming
-			var dx:Number = x-_p.x;
-			var dy:Number = y-_p.y;
+			var dx:Number = x-_player.x;
+			var dy:Number = y-_player.y;
 			var da:Number = FlxG.getAngle(dx,dy);
 			if(da < 0)
 				da += 360;

@@ -17,7 +17,7 @@ package com.adamatomic.Mode
 			_fading = false;
 			FlxG.flash(0xffd8eba2);
 			this.add(new FlxEmitter(0,-50,FlxG.width,0,null,0.03,0,0,0,100,-360,360,80,0,ImgGibs,120,true)) as FlxEmitter;
-			this.add(new FlxText(0,FlxG.height/2-35,FlxG.width,80,"VICTORY\n\nSCORE: "+FlxG.score,0xd8eba2,null,16,"center"));
+			this.add(new FlxText(0,FlxG.height/2-35,FlxG.width,"VICTORY\n\nSCORE: "+FlxG.score,0xd8eba2,null,16,"center"));
 		}
 
 		override public function update():void
