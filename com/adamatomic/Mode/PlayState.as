@@ -143,9 +143,9 @@ package com.adamatomic.Mode
 			super.update();
 			
 			//collisions with environment
-			FlxG.collideArrays(_blocks,_bullets);
-			FlxG.collideArrays(_blocks,_botBullets);
-			FlxG.collideArrays(_blocks,_bots);
+			FlxG.collideArrays(_bullets,_blocks);
+			FlxG.collideArrays(_botBullets,_blocks);
+			FlxG.collideArrays(_bots,_blocks);
 			FlxG.collideArrayX(_blocks,_player);
 			FlxG.collideArrayY(_blocks,_player);
 			
