@@ -19,7 +19,7 @@ package com.adamatomic.Mode
 			super();
 			
 			//create tilemap
-			_tilemap = new FlxTilemap(new TxtMap,ImgTiles,3);
+			_tilemap = new FlxTilemap(new TxtMap,ImgTiles,8,3);
 			//_tilemap = new FlxTilemap(new TxtMap2,ImgTiles,3); //This is an alternate tiny map
 			
 			//create player and bullets
