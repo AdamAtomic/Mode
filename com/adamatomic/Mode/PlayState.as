@@ -131,7 +131,7 @@ package com.adamatomic.Mode
 			_jamText.scrollFactor.x = _jamText.scrollFactor.y = 0;
 			_jamText.visible = false;
 			
-			FlxG.setMusic(SndMode);
+			FlxG.playMusic(SndMode);
 			FlxG.flash(0xff131c1b);
 			_fading = false;
 		}
@@ -244,7 +244,7 @@ package com.adamatomic.Mode
 		
 		private function onVictory():void
 		{
-			FlxG.stopMusic();
+			FlxG.music.stop();
 			FlxG.switchState(VictoryState);
 		}
 		

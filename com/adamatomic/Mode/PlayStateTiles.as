@@ -44,9 +44,12 @@ package com.adamatomic.Mode
 			this.add(_tilemap);
 			_tilemap.setTileCallback(3,dig,8);
 			
-			//turn on music and fade in
-			FlxG.setMusic(SndMode);
+			//fade in
 			FlxG.flash(0xff131c1b);
+			
+			//The music in this mode is positional - it fades out toward the edges of the level
+			var s:FlxSound = FlxG.play(SndMode,1,true);
+			s.proximity(320,320,_player,160);
 		}
 
 		override public function update():void
