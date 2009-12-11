@@ -41,6 +41,14 @@ package com.adamatomic.Mode
 			_ok2 = false;
 			
 			FlxG.showCursor(ImgCursor);
+			
+			//Simple use of flixel save games
+			var save:FlxSave = new FlxSave("Mode");
+			if(save.data.plays == null)
+				save.data.plays = 0;
+			else
+				save.data.plays++;
+			FlxG.log("Number of plays: "+save.data.plays);
 		}
 
 		override public function update():void
