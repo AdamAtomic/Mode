@@ -1,5 +1,7 @@
 package com.adamatomic.Mode
 {
+	import flash.geom.Point;
+	
 	import org.flixel.*;
 
 	public class PlayState extends FlxState
@@ -47,12 +49,29 @@ package com.adamatomic.Mode
 			//create level
 			var i:uint;
 			var r:uint = 160;
+			var b:FlxBlock;
 			_blocks = new Array();
-			_blocks.push(this.add(new FlxBlock(0,0,640,16,ImgTech)));
-			_blocks.push(this.add(new FlxBlock(0,16,16,640-16,ImgTech)));
-			_blocks.push(this.add(new FlxBlock(640-16,16,16,640-16,ImgTech)));
-			_blocks.push(this.add(new FlxBlock(16,640-24,640-32,8,ImgDirtTop)));
-			_blocks.push(this.add(new FlxBlock(16,640-16,640-32,16,ImgDirt)));
+			
+			b = new FlxBlock(0,0,640,16);
+			b.loadGraphic(ImgTech);
+			_blocks.push(this.add(b));
+			
+			b = new FlxBlock(0,16,16,640-16);
+			b.loadGraphic(ImgTech);
+			_blocks.push(this.add(b));
+			
+			b = new FlxBlock(640-16,16,16,640-16);
+			b.loadGraphic(ImgTech);
+			_blocks.push(this.add(b));
+			
+			b = new FlxBlock(16,640-24,640-32,8);
+			b.loadGraphic(ImgDirtTop);
+			_blocks.push(this.add(b));
+			
+			b = new FlxBlock(16,640-16,640-32,16);
+			b.loadGraphic(ImgDirt);
+			_blocks.push(this.add(b));
+			
 			buildRoom(r*0,r*0,true);
 			buildRoom(r*1,r*0);
 			buildRoom(r*2,r*0);
@@ -83,11 +102,19 @@ package com.adamatomic.Mode
 			FlxG.followBounds(0,0,640,640);
 			
 			//HUD - score
-			_score = new FlxText(0,0,FlxG.width,null,0xd8eba2,null,16,"center");
-			_score.scrollFactor.x = _score.scrollFactor.y = 0;
-			_scoreShadow = this.add(new FlxText(_score.x+2,_score.y+2,_score.width,null,0x131c1b,null,16,"center")) as FlxText;
-			_scoreShadow.scrollFactor.x = _scoreShadow.scrollFactor.y = 0;
-			this.add(_score);
+			var ssf:Point = new Point(0,0);
+			_score = new FlxText(0,0,FlxG.width);
+			_score.color = 0xd8eba2;
+			_score.size = 16;
+			_score.alignment = "center";
+			_score.scrollFactor = ssf;
+			_scoreShadow = new FlxText(_score.x+2,_score.y+2,_score.width);
+			_scoreShadow.color = 0x131c1b;
+			_scoreShadow.size = _score.size;
+			_scoreShadow.alignment = _score.alignment;
+			_scoreShadow.scrollFactor = ssf;
+			add(_scoreShadow);
+			add(_score);
 			if(FlxG.scores.length < 2)
 			{
 				FlxG.scores.push(0);
@@ -95,11 +122,16 @@ package com.adamatomic.Mode
 			}
 			
 			//HUD - highest and last scores
-			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2,null,0xd8eba2,null,8,"right");
-			_score2.scrollFactor.x = _score2.scrollFactor.y = 0;
-			_score2Shadow = this.add(new FlxText(_score2.x+1,_score2.y+1,_score2.width,null,0x131c1b,null,8,"right")) as FlxText;
-			_score2Shadow.scrollFactor.x = _score2Shadow.scrollFactor.y = 0;
-			this.add(_score2);
+			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2)
+			_score2.color = 0xd8eba2;
+			_score2.alignment = "right";
+			_score2.scrollFactor = ssf;
+			_score2Shadow = new FlxText(_score2.x+1,_score2.y+1,_score2.width);
+			_score2Shadow.color = 0x131c1b;
+			_score2Shadow.alignment = _score2.alignment;
+			_score2Shadow.scrollFactor = ssf;
+			add(_score2Shadow);
+			add(_score2);
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
 			if(FlxG.scores[0] != 0)
@@ -115,7 +147,8 @@ package com.adamatomic.Mode
 			var tmp:FlxSprite;
 			for(i = 0; i < 6; i++)
 			{
-				tmp = new FlxSprite(ImgNotch,4+i*10,4,true,false);
+				tmp = new FlxSprite(4+i*10,4);
+				tmp.loadGraphic(ImgNotch,true);
 				tmp.scrollFactor.x = tmp.scrollFactor.y = 0;
 				tmp.addAnimation("on",[0]);
 				tmp.addAnimation("off",[1]);
@@ -124,12 +157,16 @@ package com.adamatomic.Mode
 			}
 			
 			//HUD - the "gun jammed" notification
-			_jamBar = this.add(new FlxSprite(null,0,FlxG.height-22,false,false,FlxG.width,24,0xff131c1b)) as FlxSprite;
+			_jamBar = this.add((new FlxSprite(0,FlxG.height-22)).createGraphic(FlxG.width,24,0xff131c1b)) as FlxSprite;
 			_jamBar.scrollFactor.x = _jamBar.scrollFactor.y = 0;
 			_jamBar.visible = false;
-			_jamText = this.add(new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED",0xd8eba2,null,16,"center")) as FlxText;
-			_jamText.scrollFactor.x = _jamText.scrollFactor.y = 0;
+			_jamText = new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED");
+			_jamText.color = 0xd8eba2;
+			_jamText.size = 16;
+			_jamText.alignment = "center";
+			_jamText.scrollFactor = ssf;
 			_jamText.visible = false;
+			add(_jamText);
 			
 			FlxG.playMusic(SndMode);
 			FlxG.flash(0xff131c1b);
@@ -288,13 +325,23 @@ package com.adamatomic.Mode
 					else
 						check = true;
 				} while(!check);
-				_blocks.push(this.add(new FlxBlock(RX+bx*8,RY+by*8,bw*8,bh*8,ImgTech)));
+				
+				var b:FlxBlock;
+				
+				b = new FlxBlock(RX+bx*8,RY+by*8,bw*8,bh*8);
+				b.loadGraphic(ImgTech);
+				_blocks.push(this.add(b));
 				
 				//If the block has room, add some non-colliding "dirt" graphics for variety
 				if((bw >= 4) && (bh >= 5))
 				{
-					this.add(new FlxBlock(RX+bx*8+8,RY+by*8,bw*8-16,8,ImgDirtTop));
-					this.add(new FlxBlock(RX+bx*8+8,RY+by*8+8,bw*8-16,bh*8-24,ImgDirt));
+					b = new FlxBlock(RX+bx*8+8,RY+by*8,bw*8-16,8);
+					b.loadGraphic(ImgDirtTop);
+					this.add(b);
+					
+					b = new FlxBlock(RX+bx*8+8,RY+by*8+8,bw*8-16,bh*8-24);
+					b.loadGraphic(ImgDirt);
+					this.add(b);
 				}
 			}
 			

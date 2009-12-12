@@ -24,7 +24,8 @@ package com.adamatomic.Mode
 		
 		public function Player(X:int,Y:int,Bullets:Array)
 		{
-			super(ImgSpaceman,X,Y,true,true,8);
+			super(X,Y);
+			loadGraphic(ImgSpaceman,true,true,8);
 			_restart = 0;
 			
 			//bounding box tweaks
@@ -55,7 +56,13 @@ package com.adamatomic.Mode
 			_curBullet = 0;
 			_bulletVel = 360;
 			
-			_gibs = FlxG.state.add(new FlxEmitter(0,0,0,0,null,-1.5,-150,150,-200,0,-720,720,400,0,ImgGibs,60,true)) as FlxEmitter;
+			//Gibs emitted upon death
+			_gibs = new FlxEmitter(0,0,-1.5);
+			_gibs.setXVelocity(-150,150);
+			_gibs.setYVelocity(-200,0);
+			_gibs.setRotation(-720,-720);
+			_gibs.createSprites(ImgGibs);
+			FlxG.state.add(_gibs);
 		}
 		
 		override public function update():void

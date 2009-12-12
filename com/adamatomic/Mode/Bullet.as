@@ -8,12 +8,10 @@ package com.adamatomic.Mode
 		[Embed(source="../../../data/jump.mp3")] private var SndHit:Class;
 		[Embed(source="../../../data/shoot.mp3")] private var SndShoot:Class;
 		
-		private var layer:FlxLayer;
-		private var emitter:FlxEmitter;
-		
 		public function Bullet()
 		{
-			super(ImgBullet,0,0,true);
+			super();
+			loadGraphic(ImgBullet,true);
 			width = 6;
 			height = 6;
 			offset.x = 1;

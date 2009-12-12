@@ -18,7 +18,8 @@ package com.adamatomic.Mode
 		
 		public function Spawner(X:int, Y:int,Bots:Array,BotBullets:Array,ThePlayer:Player)
 		{
-			super(ImgSpawner, X, Y, true, false);
+			super(X,Y);
+			loadGraphic(ImgSpawner,true);
 			_b = Bots;
 			_b2 = BotBullets;
 			_player = ThePlayer;
@@ -73,8 +74,16 @@ package com.adamatomic.Mode
 			FlxG.quake(0.005,0.35);
 			FlxG.flash(0xffd8eba2,0.35);
 			makeBot();
-			_gibs = FlxG.state.add(new FlxEmitter(x+width/2,y+height/2,0,0,null,-2,-200,200,-300,0,-720,720,400,0,ImgSpawnerGibs,50,true)) as FlxEmitter;
+			
+			//Gibs emitted upon death
+			_gibs = new FlxEmitter(x+width/2,y+height/2,-2);
+			_gibs.setXVelocity(-200,200);
+			_gibs.setYVelocity(-300,0);
+			_gibs.setRotation(-720,-720);
+			_gibs.createSprites(ImgSpawnerGibs);
+			FlxG.state.add(_gibs);
 			_gibs.restart();
+
 			FlxG.score += 1000;
 		}
 		

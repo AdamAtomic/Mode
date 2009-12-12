@@ -22,20 +22,31 @@ package com.adamatomic.Mode
 			var a:Array = new Array();
 			for(i = 0; i < 2000; i++)
 			{
+				s = new FlxSprite();
 				if(i%3)
-					s = new FlxSprite(null,0,0,false,false,16,16,0xff3a5c39);
+					s.createGraphic(16,16,0xff3a5c39);
 				else
-					s = new FlxSprite(null,0,0,false,false,2,2,0xffd8eba2);
-				a.push(this.add(s));
+					s.createGraphic(2,2,0xffd8eba2);
+				a.push(add(s));
 			}
-			_e = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10,100,30,a,-5,-100,100,-800,-100,0,0,400);
-			_e.kill();
-			this.add(_e);
+			_e = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10,-5);
+			_e.setSize(100,30);
+			_e.setYVelocity(-800,-100);
+			_e.setRotation();
+			_e.loadSprites(a);
+			add(_e);
 				
-			_t1 = this.add(new FlxText(FlxG.width,FlxG.height/3,80,"mo",0x3a5c39,null,32)) as FlxText;
+			_t1 = new FlxText(FlxG.width,FlxG.height/3,80,"mo");
+			_t1.size = 32;
+			_t1.color = 0x3a5c39;
 			_t1.antialiasing = true;
-			_t2 = this.add(new FlxText(-60,FlxG.height/3,80,"de",0x3a5c39,null,32)) as FlxText;
-			_t2.antialiasing = true;
+			add(_t1);
+
+			_t2 = new FlxText(-60,FlxG.height/3,80,"de");
+			_t2.size = _t1.size;
+			_t2.color = _t1.color;
+			_t2.antialiasing = _t1.antialiasing;
+			add(_t2);
 			
 			_ok = false;
 			_ok2 = false;
@@ -81,20 +92,51 @@ package com.adamatomic.Mode
 				_t1.angle = FlxG.random()*40-20;
 				_t2.angle = FlxG.random()*40-20;
 				
-				this.add(new FlxText(t1m,FlxG.height/3+39,110,"by Adam Atomic",0x3a5c39,null,8,"center"));
+				var t1:FlxText;
+				var t2:FlxText;
+				var b:FlxButton;
+				
+				t1 = new FlxText(t1m,FlxG.height/3+39,110,"by Adam Atomic")
+				t1.alignment = "center";
+				t1.color = 0x3a5c39;
+				add(t1);
 				
 				//flixel button
-				this.add(new FlxSprite(null,t1m+1,FlxG.height/3+53,false,false,106,19,0xff131c1b));
-				this.add(new FlxButton(t1m+2,FlxG.height/3+54,new FlxSprite(null,0,0,false,false,104,15,0xff3a5c39),onFlixel,new FlxSprite(null,0,0,false,false,104,15,0xff729954),new FlxText(15,1,100,"www.flixel.org",0x729954),new FlxText(15,1,100,"www.flixel.org",0xd8eba2)));
+				this.add((new FlxSprite(t1m+1,FlxG.height/3+53)).createGraphic(106,19,0xff131c1b));
+				b = new FlxButton(t1m+2,FlxG.height/3+54,onFlixel);
+				b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				t1 = new FlxText(15,1,100,"www.flixel.org");
+				t1.color = 0x729954;
+				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
+				t2.color = 0xd8eba2;
+				b.loadText(t1,t2);
+				add(b);
 				
 				//danny B button
-				this.add(new FlxSprite(null,t1m+1,FlxG.height/3+75,false,false,106,19,0xff131c1b));
-				this.add(new FlxButton(t1m+2,FlxG.height/3+76,new FlxSprite(null,0,0,false,false,104,15,0xff3a5c39),onDanny,new FlxSprite(null,0,0,false,false,104,15,0xff729954),new FlxText(8,1,100,"music by danny B",0x729954),new FlxText(8,1,100,"music by danny B",0xd8eba2)));
+				this.add((new FlxSprite(t1m+1,FlxG.height/3+75)).createGraphic(106,19,0xff131c1b));
+				b = new FlxButton(t1m+2,FlxG.height/3+76,onDanny);
+				b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				t1 = new FlxText(8,1,100,"music by danny B");
+				t1.color = 0x729954;
+				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
+				t2.color = 0xd8eba2;
+				b.loadText(t1,t2);
+				add(b);
 				
 				//play button
-				this.add(new FlxSprite(null,t1m+1,FlxG.height/3+137,false,false,106,19,0xff131c1b));
-				this.add(new FlxText(t1m,FlxG.height/3+139,110,"PRESS X+C TO PLAY.",0x729954,null,8,"center"));
-				_b = this.add(new FlxButton(t1m+2,FlxG.height/3+138,new FlxSprite(null,0,0,false,false,104,15,0xff3a5c39),onButton,new FlxSprite(null,0,0,false,false,104,15,0xff729954),new FlxText(25,1,100,"CLICK HERE",0x729954),new FlxText(25,1,100,"CLICK HERE",0xd8eba2))) as FlxButton;
+				this.add((new FlxSprite(t1m+1,FlxG.height/3+137)).createGraphic(106,19,0xff131c1b));
+				t1 = new FlxText(t1m,FlxG.height/3+139,110,"PRESS X+C TO PLAY.");
+				t1.color = 0x729954;
+				t1.alignment = "center";
+				add(t1);
+				_b = new FlxButton(t1m+2,FlxG.height/3+138,onButton);
+				_b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				t1 = new FlxText(25,1,100,"CLICK HERE");
+				t1.color = 0x729954;
+				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
+				t2.color = 0xd8eba2;
+				_b.loadText(t1,t2);
+				add(_b);
 			}
 			
 			//X + C were pressed, fade out and change to play state
@@ -128,8 +170,8 @@ package com.adamatomic.Mode
 		
 		private function onFade():void
 		{
-			FlxG.switchState(PlayState);
-			//FlxG.switchState(PlayStateTiles);
+			//FlxG.switchState(PlayState);
+			FlxG.switchState(PlayStateTiles);
 		}
 	}
 }

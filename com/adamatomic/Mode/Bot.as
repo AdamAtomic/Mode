@@ -1,8 +1,8 @@
 package com.adamatomic.Mode
 {
-	import org.flixel.*;
-	
 	import flash.geom.Point;
+	
+	import org.flixel.*;
 
 	public class Bot extends FlxSprite
 	{
@@ -23,7 +23,8 @@ package com.adamatomic.Mode
 		
 		public function Bot(xPos:int,yPos:int,Bullets:Array,ThePlayer:Player)
 		{
-			super(ImgBot,xPos,yPos,true);
+			super(xPos,yPos);
+			loadGraphic(ImgBot,true);
 			_player = ThePlayer;
 			_b = Bullets;
 			
@@ -40,8 +41,20 @@ package com.adamatomic.Mode
 			addAnimation("idle", [0]);
 			addAnimation("dead", [1, 2, 3, 4, 5], 15, false);
 
-			_gibs = FlxG.state.add(new FlxEmitter(0,0,0,0,null,-1.5,-150,150,-200,0,-720,720,400,0,ImgGibs,20,true)) as FlxEmitter;
-			_jets = FlxG.state.add(new FlxEmitter(0,0,0,0,null,0.01,0,0,0,0,0,0,0,0,ImgJet,15)) as FlxEmitter;
+			//Gibs emitted upon death
+			_gibs = new FlxEmitter(0,0,-1.5);
+			_gibs.setXVelocity(-150,150);
+			_gibs.setYVelocity(-200,0);
+			_gibs.setRotation(-720,-720);
+			_gibs.createSprites(ImgGibs,20);
+			FlxG.state.add(_gibs);
+			
+			//Jet effect that shoots out from behind the bot
+			_jets = new FlxEmitter(0,0,0.01);
+			_jets.setRotation();
+			_jets.gravity = 0;
+			_jets.createSprites(ImgJet,15);
+			FlxG.state.add(_jets);
 
 			reset(x,y);
 		}
@@ -90,10 +103,8 @@ package com.adamatomic.Mode
 				_jets.x = x + width/2;
 				_jets.y = y + height/2;
 				var v:Point = FlxG.rotatePoint(thrust,0,0,0,angle);
-				_jets.maxVelocity.x = v.x+30;
-				_jets.minVelocity.x = v.x-30;
-				_jets.maxVelocity.y = v.y+30;
-				_jets.minVelocity.y = v.y-30;
+				_jets.setXVelocity(v.x-30,v.x+30);
+				_jets.setYVelocity(v.y-30,v.y+30);
 			}
 
 			//Shooting

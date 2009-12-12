@@ -9,7 +9,9 @@ package {
 	{
 		public function Mode():void
 		{
-			super(320,240,MenuState,2,0xff131c1b,true,0xff729954);
+			super(320,240,MenuState);
+			FlxG.setBackgroundColor(0xff131c1b);
+			setLogoFX(0xff729954);
 			help("Jump", "Shoot", "Nothing");
 			useDefaultHotKeys = true;
 		}

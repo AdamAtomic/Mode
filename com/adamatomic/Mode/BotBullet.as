@@ -10,7 +10,8 @@ package com.adamatomic.Mode
 		
 		public function BotBullet()
 		{
-			super(ImgBullet,0,0,true);
+			super();
+			loadGraphic(ImgBullet,true);
 			addAnimation("idle",[0, 1], 50);
 			addAnimation("poof",[2, 3, 4], 50, false);
 			exists = false;
