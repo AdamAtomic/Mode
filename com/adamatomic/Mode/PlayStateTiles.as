@@ -19,8 +19,10 @@ package com.adamatomic.Mode
 			super();
 			
 			//create tilemap
-			_tilemap = new FlxTilemap(new TxtMap,ImgTiles,8,3);
-			//_tilemap = new FlxTilemap(new TxtMap2,ImgTiles,3); //This is an alternate tiny map
+			_tilemap = new FlxTilemap();
+			_tilemap.collideIndex = 3;
+			_tilemap.loadMap(new TxtMap,ImgTiles,8);
+			//_tilemap.loadMap(new TxtMap2,ImgTiles,8); //This is an alternate tiny map
 			
 			//create player and bullets
 			_bullets = new Array();
@@ -42,7 +44,7 @@ package com.adamatomic.Mode
 			
 			//add tilemap last so it is in front, looks neat
 			this.add(_tilemap);
-			_tilemap.setTileCallback(3,dig,8);
+			_tilemap.setCallback(3,dig,8);
 			
 			//fade in
 			FlxG.flash(0xff131c1b);
