@@ -5,7 +5,6 @@ package com.adamatomic.Mode
 	public class Player extends FlxSprite
 	{
 		[Embed(source="../../../data/spaceman.png")] private var ImgSpaceman:Class;
-		[Embed(source="../../../data/gibs.png")] private var ImgGibs:Class;
 		[Embed(source="../../../data/jump.mp3")] private var SndJump:Class;
 		[Embed(source="../../../data/land.mp3")] private var SndLand:Class;
 		[Embed(source="../../../data/asplode.mp3")] private var SndExplode:Class;
@@ -22,7 +21,7 @@ package com.adamatomic.Mode
 		private var _restart:Number;
 		private var _gibs:FlxEmitter;
 		
-		public function Player(X:int,Y:int,Bullets:Array)
+		public function Player(X:int,Y:int,Bullets:Array,Gibs:FlxEmitter)
 		{
 			super(X,Y);
 			loadGraphic(ImgSpaceman,true,true,8);
@@ -57,12 +56,7 @@ package com.adamatomic.Mode
 			_bulletVel = 360;
 			
 			//Gibs emitted upon death
-			_gibs = new FlxEmitter(0,0,-1.5);
-			_gibs.setXVelocity(-150,150);
-			_gibs.setYVelocity(-200,0);
-			_gibs.setRotation(-720,-720);
-			_gibs.createSprites(ImgGibs);
-			FlxG.state.add(_gibs);
+			_gibs = Gibs;
 		}
 		
 		override public function update():void
@@ -72,7 +66,7 @@ package com.adamatomic.Mode
 			{
 				_restart += FlxG.elapsed;
 				if(_restart > 2)
-					FlxG.switchState(PlayState);
+					(FlxG.state as PlayState).reload = true;
 				return;
 			}
 			
@@ -162,11 +156,12 @@ package com.adamatomic.Mode
 			}
 		}
 		
-		override public function hitFloor(Contact:FlxCore=null):Boolean
+		override public function hitBottom(Contact:FlxObject,Velocity:Number):void
 		{
 			if(velocity.y > 50)
 				FlxG.play(SndLand);
-			return super.hitFloor();
+			onFloor = true;
+			return super.hitBottom(Contact,Velocity);
 		}
 		
 		override public function hurt(Damage:Number):void
@@ -188,17 +183,20 @@ package com.adamatomic.Mode
 		{
 			if(dead)
 				return;
+			solid = false;
 			FlxG.play(SndExplode);
 			FlxG.play(SndExplode2);
 			super.kill();
 			flicker(-1);
 			exists = true;
 			visible = false;
-			FlxG.quake(0.005,0.35);
-			FlxG.flash(0xffd8eba2,0.35);
-			_gibs.x = x + width/2;
-			_gibs.y = y + height/2;
-			_gibs.restart();
+			FlxG.quake.start(0.005,0.35);
+			FlxG.flash.start(0xffd8eba2,0.35);
+			if(_gibs != null)
+			{
+				_gibs.at(this);
+				_gibs.start(true,50);
+			}
 		}
 	}
 }

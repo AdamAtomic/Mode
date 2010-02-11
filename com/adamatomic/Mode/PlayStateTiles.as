@@ -11,13 +11,11 @@ package com.adamatomic.Mode
 		
 		//major game objects
 		private var _tilemap:FlxTilemap;
-		private var _bullets:Array;
+		private var _bullets:FlxGroup;
 		private var _player:Player;
 		
-		function PlayStateTiles():void
+		override public function create():void
 		{
-			super();
-			
 			//create tilemap
 			_tilemap = new FlxTilemap();
 			_tilemap.collideIndex = 3;
@@ -25,14 +23,14 @@ package com.adamatomic.Mode
 			//_tilemap.loadMap(new TxtMap2,ImgTiles,8); //This is an alternate tiny map
 			
 			//create player and bullets
-			_bullets = new Array();
-			_player = new Player(_tilemap.width/2-4,_tilemap.height/2-4,_bullets);
-			_player.addAnimationCallback(animationCallbackTest);
+			_bullets = new FlxGroup();
+			_player = new Player(_tilemap.width/2-4,_tilemap.height/2-4,_bullets.members,null);
 			for(var i:uint = 0; i < 8; i++)
-				_bullets.push(this.add(new Bullet()));
+				_bullets.add(new Bullet());
+			add(_bullets);
 			
 			//add player and set up camera
-			this.add(_player);
+			add(_player);
 			FlxG.follow(_player,2.5);
 			FlxG.followAdjust(0.5,0.0);
 			_tilemap.follow();	//Set the followBounds to the map dimensions
@@ -43,11 +41,10 @@ package com.adamatomic.Mode
 			//FlxG.followBounds(fx,fy,fx,fy);
 			
 			//add tilemap last so it is in front, looks neat
-			this.add(_tilemap);
-			_tilemap.setCallback(3,dig,8);
+			add(_tilemap);
 			
 			//fade in
-			FlxG.flash(0xff131c1b);
+			FlxG.flash.start(0xff131c1b);
 			
 			//The music in this mode is positional - it fades out toward the edges of the level
 			var s:FlxSound = FlxG.play(SndMode,1,true);
@@ -57,25 +54,8 @@ package com.adamatomic.Mode
 		override public function update():void
 		{
 			super.update();
-			_tilemap.collideArray(_bullets);
 			_tilemap.collide(_player);
-			
-			if(FlxG.keys.justPressed("M"))
-			{
-				for(var i:uint = 0; i < _tilemap.widthInTiles; i++)
-					_tilemap.setTile(i,_tilemap.heightInTiles-1,int(FlxG.random()*5));
-			}
-		}
-		
-		private function animationCallbackTest(Name:String, Frame:uint, FrameIndex:uint):void
-		{
-			FlxG.log("ANIMATION NAME: "+Name+", FRAME: "+Frame+", FRAME INDEX: "+FrameIndex);
-		}
-		
-		private function dig(Core:FlxCore,X:uint,Y:uint,Tile:uint):void
-		{
-			if(Core is Bullet)
-				_tilemap.setTile(X,Y,0);
+			_tilemap.collide(_bullets);
 		}
 	}
 }

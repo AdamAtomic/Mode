@@ -1,76 +1,101 @@
 package com.adamatomic.Mode
 {
-	import flash.geom.Point;
-	
 	import org.flixel.*;
 
 	public class PlayState extends FlxState
 	{
-		[Embed(source="../../../data/tech_tiles.png")] private var ImgTech:Class;
-		[Embed(source="../../../data/dirt_top.png")] private var ImgDirtTop:Class;
-		[Embed(source="../../../data/dirt.png")] private var ImgDirt:Class;
-		[Embed(source="../../../data/notch.png")] private var ImgNotch:Class;
-		[Embed(source="../../../data/mode.mp3")] private var SndMode:Class;
-		[Embed(source="../../../data/countdown.mp3")] private var SndCount:Class;
+		[Embed(source="../../../data/tech_tiles.png")] protected var ImgTech:Class;
+		[Embed(source="../../../data/dirt_top.png")] protected var ImgDirtTop:Class;
+		[Embed(source="../../../data/dirt.png")] protected var ImgDirt:Class;
+		[Embed(source="../../../data/notch.png")] protected var ImgNotch:Class;
+		[Embed(source="../../../data/mode.mp3")] protected var SndMode:Class;
+		[Embed(source="../../../data/countdown.mp3")] protected var SndCount:Class;
+		[Embed(source="../../../data/gibs.png")] private var ImgGibs:Class;
+		[Embed(source="../../../data/spawner_gibs.png")] private var ImgSpawnerGibs:Class;
 		
 		//major game objects
-		private var _blocks:Array;
-		private var _bullets:Array;
-		private var _player:Player;
-		private var _bots:Array;
-		private var _spawners:Array;
-		private var _botBullets:Array;
+		protected var _blocks:FlxGroup;
+		protected var _decorations:FlxGroup;
+		protected var _bullets:FlxGroup;
+		protected var _player:Player;
+		protected var _bots:FlxGroup;
+		protected var _spawners:FlxGroup;
+		protected var _botBullets:FlxGroup;
+		protected var _littleGibs:FlxEmitter;
+		protected var _bigGibs:FlxEmitter;
+		
+		//meta groups, to help speed up collisions
+		protected var _objects:FlxGroup;
+		protected var _enemies:FlxGroup;
 		
 		//HUD
-		private var _score:FlxText;
-		private var _scoreShadow:FlxText;
-		private var _score2:FlxText;
-		private var _score2Shadow:FlxText;
-		private var _scoreTimer:Number;
-		private var _jamTimer:Number;
-		private var _jamBar:FlxSprite;
-		private var _jamText:FlxText;
-		private var _notches:Array;
+		protected var _score:FlxText;
+		protected var _scoreShadow:FlxText;
+		protected var _score2:FlxText;
+		protected var _score2Shadow:FlxText;
+		protected var _scoreTimer:Number;
+		protected var _jamTimer:Number;
+		protected var _jamBar:FlxSprite;
+		protected var _jamText:FlxText;
+		protected var _notches:Array;
 		
 		//just to prevent weirdness during level transition
-		private var _fading:Boolean;
+		protected var _fading:Boolean;
 		
-		function PlayState():void
+		//used to safely reload the playstate after dying
+		public var reload:Boolean;
+		
+		override public function create():void
 		{
-			super();
+			FlxG.mouse.hide();
+			reload = false;
 			
-			//create basic objects
-			_bullets = new Array();
-			_player = new Player(316,300,_bullets);
-			_botBullets = new Array();
-			_bots = new Array();
-			_spawners = new Array();
+			//get the gibs set up and out of the way
+			_littleGibs = new FlxEmitter();
+			_littleGibs.delay = 1.5;
+			_littleGibs.setXSpeed(-150,150);
+			_littleGibs.setYSpeed(-200,0);
+			_littleGibs.setRotation(-720,-720);
+			_littleGibs.createSprites(ImgGibs,100,10,true,0.5);
+			_bigGibs = new FlxEmitter();
+			_bigGibs.setXSpeed(-200,200);
+			_bigGibs.setYSpeed(-300,0);
+			_bigGibs.setRotation(-720,-720);
+			_bigGibs.createSprites(ImgSpawnerGibs,50,20,true,0.5);
 			
-			//create level
+			//level generation needs to know about the spawners (and thusly the bots, players, etc)
+			_blocks = new FlxGroup();
+			_decorations = new FlxGroup();
+			_bullets = new FlxGroup();
+			_player = new Player(316,300,_bullets.members,_littleGibs);
+			_bots = new FlxGroup();
+			_botBullets = new FlxGroup();
+			_spawners = new FlxGroup();
+			
+			//simple procedural level generation
 			var i:uint;
 			var r:uint = 160;
-			var b:FlxBlock;
-			_blocks = new Array();
+			var b:FlxTileblock;
 			
-			b = new FlxBlock(0,0,640,16);
+			b = new FlxTileblock(0,0,640,16);
 			b.loadGraphic(ImgTech);
-			_blocks.push(this.add(b));
+			_blocks.add(b);
 			
-			b = new FlxBlock(0,16,16,640-16);
+			b = new FlxTileblock(0,16,16,640-16);
 			b.loadGraphic(ImgTech);
-			_blocks.push(this.add(b));
+			_blocks.add(b);
 			
-			b = new FlxBlock(640-16,16,16,640-16);
+			b = new FlxTileblock(640-16,16,16,640-16);
 			b.loadGraphic(ImgTech);
-			_blocks.push(this.add(b));
+			_blocks.add(b);
 			
-			b = new FlxBlock(16,640-24,640-32,8);
+			b = new FlxTileblock(16,640-24,640-32,8);
 			b.loadGraphic(ImgDirtTop);
-			_blocks.push(this.add(b));
+			_blocks.add(b);
 			
-			b = new FlxBlock(16,640-16,640-32,16);
+			b = new FlxTileblock(16,640-16,640-32,16);
 			b.loadGraphic(ImgDirt);
-			_blocks.push(this.add(b));
+			_blocks.add(b);
 			
 			buildRoom(r*0,r*0,true);
 			buildRoom(r*1,r*0);
@@ -89,31 +114,54 @@ package com.adamatomic.Mode
 			buildRoom(r*2,r*3);
 			buildRoom(r*3,r*3,true);
 			
-			//create bullets
-			for(i = 0; i < 50; i++)
-				_botBullets.push(this.add(new BotBullet()));
-			for(i = 0; i < 8; i++)
-				_bullets.push(this.add(new Bullet()));
+			//Add bots and spawners after we add blocks to the state,
+			// so that they're drawn on top of the level, and so that
+			// the bots are drawn on top of both the blocks + the spawners.
+			add(_spawners);
+			add(_littleGibs);
+			add(_bigGibs);
+			add(_blocks);
+			add(_decorations);
+			add(_bots);
 			
-			//camera settings
-			this.add(_player);
+			//actually create the bullets now
+			for(i = 0; i < 50; i++)
+				_botBullets.add(new BotBullet());
+			for(i = 0; i < 8; i++)
+				_bullets.add(new Bullet());
+
+			//add player and set up scrolling camera
+			add(_player);
 			FlxG.follow(_player,2.5);
 			FlxG.followAdjust(0.5,0.0);
 			FlxG.followBounds(0,0,640,640);
 			
+			//add gibs + bullets to scene here, so they're drawn on top of pretty much everything
+			add(_botBullets);
+			add(_bullets);
+			
+			//finally we are going to sort things into a couple of helper groups.
+			//we don't add these to the state, we just use them for collisions later!
+			_enemies = new FlxGroup();
+			_enemies.add(_botBullets);
+			_enemies.add(_spawners);
+			_enemies.add(_bots);
+			_objects = new FlxGroup();
+			_objects.add(_botBullets);
+			_objects.add(_bullets);
+			_objects.add(_bots);
+			_objects.add(_player);
+			_objects.add(_littleGibs);
+			_objects.add(_bigGibs);
+			
 			//HUD - score
-			var ssf:Point = new Point(0,0);
+			var ssf:FlxPoint = new FlxPoint(0,0);
 			_score = new FlxText(0,0,FlxG.width);
 			_score.color = 0xd8eba2;
 			_score.size = 16;
 			_score.alignment = "center";
 			_score.scrollFactor = ssf;
-			_scoreShadow = new FlxText(_score.x+2,_score.y+2,_score.width);
-			_scoreShadow.color = 0x131c1b;
-			_scoreShadow.size = _score.size;
-			_scoreShadow.alignment = _score.alignment;
-			_scoreShadow.scrollFactor = ssf;
-			add(_scoreShadow);
+			_score.shadow = 0x131c1b;
 			add(_score);
 			if(FlxG.scores.length < 2)
 			{
@@ -126,11 +174,7 @@ package com.adamatomic.Mode
 			_score2.color = 0xd8eba2;
 			_score2.alignment = "right";
 			_score2.scrollFactor = ssf;
-			_score2Shadow = new FlxText(_score2.x+1,_score2.y+1,_score2.width);
-			_score2Shadow.color = 0x131c1b;
-			_score2Shadow.alignment = _score2.alignment;
-			_score2Shadow.scrollFactor = ssf;
-			add(_score2Shadow);
+			_score2.shadow = _score.shadow;
 			add(_score2);
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
@@ -152,6 +196,7 @@ package com.adamatomic.Mode
 				tmp.scrollFactor.x = tmp.scrollFactor.y = 0;
 				tmp.addAnimation("on",[0]);
 				tmp.addAnimation("off",[1]);
+				tmp.moves = false;
 				tmp.play("on");
 				_notches.push(this.add(tmp));
 			}
@@ -169,7 +214,7 @@ package com.adamatomic.Mode
 			add(_jamText);
 			
 			FlxG.playMusic(SndMode);
-			FlxG.flash(0xff131c1b);
+			FlxG.flash.start(0xff131c1b);
 			_fading = false;
 		}
 
@@ -180,18 +225,9 @@ package com.adamatomic.Mode
 			super.update();
 			
 			//collisions with environment
-			FlxG.collideArrays(_bullets,_blocks);
-			FlxG.collideArrays(_botBullets,_blocks);
-			FlxG.collideArrays(_bots,_blocks);
-			FlxG.collideArrayX(_blocks,_player);
-			FlxG.collideArrayY(_blocks,_player);
-			
-			//collisions between sprites
-			FlxG.overlapArrays(_bullets,_bots,bulletHitBot);
-			FlxG.overlapArrays(_bullets,_spawners,bulletHitBot);
-			FlxG.overlapArray(_bots,_player,botHitPlayer);
-			FlxG.overlapArray(_spawners,_player,botHitPlayer);
-			FlxG.overlapArray(_botBullets,_player,bulletHitBot);
+			FlxU.collide(_blocks,_objects);
+			FlxU.overlap(_enemies,_player,overlapped);
+			FlxU.overlap(_bullets,_enemies,overlapped);
 			
 			//Jammed message
 			if(FlxG.keys.justPressed("C") && _player.flickering())
@@ -238,20 +274,18 @@ package com.adamatomic.Mode
 				}
 			
 				//Fade out to victory screen stuffs
-				var i:uint;
-				var found:uint = 0;
-				for(i = 0; i < _spawners.length; i++)
-					if(!_spawners[i].dead) found++;
-				if(found == 0)
+				var spawnerCount:int = _spawners.countLiving();
+				if(spawnerCount <= 0)
 				{
 					_fading = true;
-					FlxG.fade(0xffd8eba2,3,onVictory);
+					FlxG.fade.start(0xffd8eba2,3,onVictory);
 				}
 				else
 				{
-					for(i = 0; i < _notches.length; i++)
+					var l:uint = _notches.length;
+					for(var i:uint = 0; i < l; i++)
 					{
-						if(i < found)
+						if(i < spawnerCount)
 							_notches[i].play("on");
 						else
 							_notches[i].play("off");
@@ -266,27 +300,26 @@ package com.adamatomic.Mode
 				_score.text = FlxG.score.toString();
 				_scoreShadow.text = FlxG.score.toString();
 			}
+			
+			if(reload)
+				FlxG.state = new PlayState();
 		}
-		
-		private function bulletHitBot(Bullet:FlxSprite,Bot:FlxSprite):void
+
+		protected function overlapped(Object1:FlxObject,Object2:FlxObject):void
 		{
-			Bullet.hurt(0);
-			Bot.hurt(1);
+			if((Object1 is BotBullet) || (Object1 is Bullet))
+				Object1.kill();
+			Object2.hurt(1);
 		}
 		
-		private function botHitPlayer(Bot:FlxSprite,Player:FlxSprite):void
-		{
-			Player.hurt(1);
-		}
-		
-		private function onVictory():void
+		protected function onVictory():void
 		{
 			FlxG.music.stop();
-			FlxG.switchState(VictoryState);
+			FlxG.state = new VictoryState();
 		}
 		
 		//Just plops down a spawner and some blocks - haphazard and crappy atm but functional!
-		private function buildRoom(RX:uint,RY:uint,Spawners:Boolean=false):void
+		protected function buildRoom(RX:uint,RY:uint,Spawners:Boolean=false):void
 		{
 			//first place the spawn point (if necessary)
 			var rw:uint = 20;
@@ -294,12 +327,12 @@ package com.adamatomic.Mode
 			var sy:uint;
 			if(Spawners)
 			{
-				sx = 2+FlxG.random()*(rw-7);
-				sy = 2+FlxG.random()*(rw-7);
+				sx = 2+FlxU.random()*(rw-7);
+				sy = 2+FlxU.random()*(rw-7);
 			}
 			
 			//then place a bunch of blocks
-			var numBlocks:uint = 3+FlxG.random()*4;
+			var numBlocks:uint = 3+FlxU.random()*4;
 			if(!Spawners) numBlocks++;
 			var maxW:uint = 10;
 			var minW:uint = 2;
@@ -316,38 +349,38 @@ package com.adamatomic.Mode
 				do
 				{
 					//keep generating different specs if they overlap the spawner
-					bw = minW + FlxG.random()*(maxW-minW);
-					bh = minH + FlxG.random()*(maxH-minH);
-					bx = -1 + FlxG.random()*(rw+1-bw);
-					by = -1 + FlxG.random()*(rw+1-bh);
+					bw = minW + FlxU.random()*(maxW-minW);
+					bh = minH + FlxU.random()*(maxH-minH);
+					bx = -1 + FlxU.random()*(rw+1-bw);
+					by = -1 + FlxU.random()*(rw+1-bh);
 					if(Spawners)
 						check = ((sx>bx+bw) || (sx+3<bx) || (sy>by+bh) || (sy+3<by));
 					else
 						check = true;
 				} while(!check);
 				
-				var b:FlxBlock;
+				var b:FlxTileblock;
 				
-				b = new FlxBlock(RX+bx*8,RY+by*8,bw*8,bh*8);
+				b = new FlxTileblock(RX+bx*8,RY+by*8,bw*8,bh*8);
 				b.loadGraphic(ImgTech);
-				_blocks.push(this.add(b));
+				_blocks.add(b);
 				
 				//If the block has room, add some non-colliding "dirt" graphics for variety
 				if((bw >= 4) && (bh >= 5))
 				{
-					b = new FlxBlock(RX+bx*8+8,RY+by*8,bw*8-16,8);
+					b = new FlxTileblock(RX+bx*8+8,RY+by*8,bw*8-16,8);
 					b.loadGraphic(ImgDirtTop);
-					this.add(b);
+					_decorations.add(b);
 					
-					b = new FlxBlock(RX+bx*8+8,RY+by*8+8,bw*8-16,bh*8-24);
+					b = new FlxTileblock(RX+bx*8+8,RY+by*8+8,bw*8-16,bh*8-24);
 					b.loadGraphic(ImgDirt);
-					this.add(b);
+					_decorations.add(b);
 				}
 			}
 			
 			//Finally actually add the spawner
 			if(Spawners)
-				_spawners.push(this.add(new Spawner(RX+sx*8,RY+sy*8,_bots,_botBullets,_player)));
+				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_bots,_botBullets.members,_littleGibs,_player));
 		}
 	}
 }

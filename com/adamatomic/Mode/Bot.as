@@ -7,7 +7,6 @@ package com.adamatomic.Mode
 	public class Bot extends FlxSprite
 	{
 		[Embed(source="../../../data/bot.png")] private var ImgBot:Class;
-		[Embed(source="../../../data/gibs.png")] private var ImgGibs:Class;
 		[Embed(source="../../../data/jet.png")] private var ImgJet:Class;
 		[Embed(source="../../../data/asplode.mp3")] private var SndExplode:Class;
 		[Embed(source="../../../data/hit.mp3")] private var SndHit:Class;
@@ -21,12 +20,13 @@ package com.adamatomic.Mode
 		static private var _cb:uint = 0;
 		private var _shotClock:Number;
 		
-		public function Bot(xPos:int,yPos:int,Bullets:Array,ThePlayer:Player)
+		public function Bot(xPos:int,yPos:int,Bullets:Array,Gibs:FlxEmitter,ThePlayer:Player)
 		{
 			super(xPos,yPos);
-			loadGraphic(ImgBot,true);
+			loadRotatedGraphic(ImgBot,32,0);
 			_player = ThePlayer;
 			_b = Bullets;
+			_gibs = Gibs;
 			
 			width = 12;
 			height = 12;
@@ -38,37 +38,18 @@ package com.adamatomic.Mode
 			drag.x = 80;
 			drag.y = 80;
 			
-			addAnimation("idle", [0]);
-			addAnimation("dead", [1, 2, 3, 4, 5], 15, false);
-
-			//Gibs emitted upon death
-			_gibs = new FlxEmitter(0,0,-1.5);
-			_gibs.setXVelocity(-150,150);
-			_gibs.setYVelocity(-200,0);
-			_gibs.setRotation(-720,-720);
-			_gibs.createSprites(ImgGibs,20);
-			FlxG.state.add(_gibs);
-			
 			//Jet effect that shoots out from behind the bot
-			_jets = new FlxEmitter(0,0,0.01);
+			_jets = new FlxEmitter();
+			_jets.delay = 0.01;
 			_jets.setRotation();
 			_jets.gravity = 0;
 			_jets.createSprites(ImgJet,15);
-			FlxG.state.add(_jets);
 
 			reset(x,y);
 		}
 		
 		override public function update():void
-		{
-			if(dead)
-			{
-				if(finished) exists = false;
-				else
-					super.update();
-				return;
-			}
-			
+		{			
 			var ot:Number = _timer;
 			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
 			_timer += FlxG.elapsed;
@@ -78,7 +59,7 @@ package com.adamatomic.Mode
 			//Aiming
 			var dx:Number = x-_player.x;
 			var dy:Number = y-_player.y;
-			var da:Number = FlxG.getAngle(dx,dy);
+			var da:Number = FlxU.getAngle(dx,dy);
 			if(da < 0)
 				da += 360;
 			var ac:Number = angle;
@@ -98,13 +79,13 @@ package com.adamatomic.Mode
 			else if(_timer < 8)
 			{
 				if(!_jets.active)
-					_jets.restart();
+					_jets.start();
 				thrust = 40;
 				_jets.x = x + width/2;
 				_jets.y = y + height/2;
-				var v:Point = FlxG.rotatePoint(thrust,0,0,0,angle);
-				_jets.setXVelocity(v.x-30,v.x+30);
-				_jets.setYVelocity(v.y-30,v.y+30);
+				var v:FlxPoint = FlxU.rotatePoint(thrust,0,0,0,angle);
+				_jets.setXSpeed(v.x-30,v.x+30);
+				_jets.setYSpeed(v.y-30,v.y+30);
 			}
 
 			//Shooting
@@ -126,6 +107,12 @@ package com.adamatomic.Mode
 			super.update();
 		}
 		
+		override public function render():void
+		{
+			_jets.render();
+			super.render();
+		}
+		
 		override public function hurt(Damage:Number):void
 		{
 			FlxG.play(SndHit);
@@ -140,13 +127,10 @@ package com.adamatomic.Mode
 				return;
 			FlxG.play(SndExplode);
 			super.kill();
-			exists = true;
 			flicker(-1);
-			play("dead");
 			_jets.kill();
-			_gibs.x = x + width/2;
-			_gibs.y = y + height/2;
-			_gibs.restart();
+			_gibs.at(this);
+			_gibs.start(true,20);
 			FlxG.score += 200;
 		}
 		
@@ -160,12 +144,11 @@ package com.adamatomic.Mode
 			health = 2;
 			_timer = 0;
 			_shotClock = 0;
-			play("idle");
 		}
 		
 		private function shoot():void
 		{
-			var ba:Point = FlxG.rotatePoint(-120,0,0,0,angle);
+			var ba:FlxPoint = FlxU.rotatePoint(-120,0,0,0,angle);
 			_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
 			if(++_cb >= _b.length) _cb = 0;
 		}

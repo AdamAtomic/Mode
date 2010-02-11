@@ -4,37 +4,30 @@ package com.adamatomic.Mode
 
 	public class MenuState extends FlxState
 	{
+		[Embed(source="../../../data/spawner_gibs.png")] private var ImgGibs:Class;
 		[Embed(source="../../../data/cursor.png")] private var ImgCursor:Class;
 		[Embed(source="../../../data/menu_hit.mp3")] private var SndHit:Class;
 		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndHit2:Class;
 		
-		private var _e:FlxEmitter;
+		private var _gibs:FlxEmitter;
 		private var _b:FlxButton;
 		private var _t1:FlxText;
 		private var _t2:FlxText;
 		private var _ok:Boolean;
 		private var _ok2:Boolean;
 		
-		override public function MenuState():void
+		override public function create():void
 		{
 			var i:uint;
 			var s:FlxSprite;
-			var a:Array = new Array();
-			for(i = 0; i < 2000; i++)
-			{
-				s = new FlxSprite();
-				if(i%3)
-					s.createGraphic(16,16,0xff3a5c39);
-				else
-					s.createGraphic(2,2,0xffd8eba2);
-				a.push(add(s));
-			}
-			_e = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10,-5);
-			_e.setSize(100,30);
-			_e.setYVelocity(-800,-100);
-			_e.setRotation();
-			_e.loadSprites(a);
-			add(_e);
+			
+			_gibs = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10);
+			_gibs.setSize(100,30);
+			_gibs.setYSpeed(-200,-20);
+			_gibs.setRotation(-720,720);
+			_gibs.gravity = 100;
+			_gibs.createSprites(ImgGibs,1000,32);
+			add(_gibs);
 				
 			_t1 = new FlxText(FlxG.width,FlxG.height/3,80,"mo");
 			_t1.size = 32;
@@ -51,7 +44,7 @@ package com.adamatomic.Mode
 			_ok = false;
 			_ok2 = false;
 			
-			FlxG.showCursor(ImgCursor);
+			FlxG.mouse.show(ImgCursor);
 			
 			//Simple use of flixel save game object
 			var save:FlxSave = new FlxSave();
@@ -87,13 +80,13 @@ package com.adamatomic.Mode
 				//explosion
 				_ok = true;
 				FlxG.play(SndHit);
-				FlxG.flash(0xffd8eba2,0.5);
-				FlxG.quake(0.035,0.5);
+				FlxG.flash.start(0xffd8eba2,0.5);
+				FlxG.quake.start(0.035,0.5);
 				_t1.color = 0xd8eba2;
 				_t2.color = 0xd8eba2;
-				_e.restart();
-				_t1.angle = FlxG.random()*40-20;
-				_t2.angle = FlxG.random()*40-20;
+				_gibs.start(true,0,5);
+				_t1.angle = FlxU.random()*40-20;
+				_t2.angle = FlxU.random()*40-20;
 				
 				var t1:FlxText;
 				var t2:FlxText;
@@ -147,8 +140,8 @@ package com.adamatomic.Mode
 			{
 				_ok2 = true;
 				FlxG.play(SndHit2);
-				FlxG.flash(0xffd8eba2,0.5);
-				FlxG.fade(0xff131c1b,1,onFade);
+				FlxG.flash.start(0xffd8eba2,0.5);
+				FlxG.fade.start(0xff131c1b,1,onFade);
 			}
 
 			super.update();
@@ -156,12 +149,12 @@ package com.adamatomic.Mode
 		
 		private function onFlixel():void
 		{
-			FlxG.openURL("http://flixel.org");
+			FlxU.openURL("http://flixel.org");
 		}
 		
 		private function onDanny():void
 		{
-			FlxG.openURL("http://dbsoundworks.com");
+			FlxU.openURL("http://dbsoundworks.com");
 		}
 		
 		private function onButton():void
@@ -173,8 +166,8 @@ package com.adamatomic.Mode
 		
 		private function onFade():void
 		{
-			FlxG.switchState(PlayState);
-			//FlxG.switchState(PlayStateTiles);
+			FlxG.state = new PlayState();
+			//FlxG.state = new PlayStateTiles();
 		}
 	}
 }

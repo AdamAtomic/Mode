@@ -22,17 +22,18 @@ package com.adamatomic.Mode
 			if(dead && finished) exists = false;
 			else super.update();
 		}
-		
-		override public function hitWall(Contact:FlxCore=null):Boolean { hurt(0); return true; }
-		override public function hitFloor(Contact:FlxCore=null):Boolean { hurt(0); return true; }
-		override public function hitCeiling(Contact:FlxCore=null):Boolean { hurt(0); return true; }
-		override public function hurt(Damage:Number):void
+
+		override public function hitLeft(Contact:FlxObject,Velocity:Number):void { kill(); }
+		override public function hitBottom(Contact:FlxObject,Velocity:Number):void { kill(); }
+		override public function hitTop(Contact:FlxObject,Velocity:Number):void { kill(); }
+		override public function kill():void
 		{
 			if(dead) return;
 			velocity.x = 0;
 			velocity.y = 0;
 			if(onScreen()) FlxG.play(SndHit);
 			dead = true;
+			solid = false;
 			play("poof");
 		}
 		
@@ -40,6 +41,7 @@ package com.adamatomic.Mode
 		{
 			FlxG.play(SndShoot,0.5);
 			super.reset(X,Y);
+			solid = true;
 			velocity.x = VelocityX;
 			velocity.y = VelocityY;
 			play("idle");
