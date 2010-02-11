@@ -30,9 +30,7 @@ package com.adamatomic.Mode
 		
 		//HUD
 		protected var _score:FlxText;
-		protected var _scoreShadow:FlxText;
 		protected var _score2:FlxText;
-		protected var _score2Shadow:FlxText;
 		protected var _scoreTimer:Number;
 		protected var _jamTimer:Number;
 		protected var _jamBar:FlxSprite;
@@ -179,10 +177,7 @@ package com.adamatomic.Mode
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
 			if(FlxG.scores[0] != 0)
-			{
 				_score2.text = "HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score;
-				_score2Shadow.text = "HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score;
-			}
 			FlxG.score = 0;
 			_scoreTimer = 0;
 			
@@ -298,7 +293,6 @@ package com.adamatomic.Mode
 			{
 				if(_player.dead) FlxG.score = 0;
 				_score.text = FlxG.score.toString();
-				_scoreShadow.text = FlxG.score.toString();
 			}
 			
 			if(reload)
