@@ -25,7 +25,7 @@ package com.adamatomic.Mode
 			gibs.gravity = 80;
 			gibs.createSprites(ImgGibs,800,32);
 			add(gibs);
-			gibs.start(false,0,0.005);
+			gibs.start(false,0.005);
 			
 			add((new FlxText(0,FlxG.height/2-35,FlxG.width,"VICTORY\n\nSCORE: "+FlxG.score)).setFormat(null,16,0xd8eba2,"center"));
 		}

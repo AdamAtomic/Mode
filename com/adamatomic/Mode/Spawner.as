@@ -76,7 +76,7 @@ package com.adamatomic.Mode
 			FlxG.flash.start(0xffd8eba2,0.35);
 			makeBot();
 			_gibs.at(this);
-			_gibs.start(true,0,2);
+			_gibs.start(true,2,0);
 			FlxG.score += 1000;
 		}
 		

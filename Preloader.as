@@ -1,4 +1,4 @@
-package { import org.flixel.data.FlxFactory; public class Preloader extends FlxFactory { public function Preloader():void {
+package { import org.flixel.FlxPreloader; public class Preloader extends FlxPreloader { public function Preloader():void {
 	
 	className = "Mode";
 	//myURL = "adamatomic.com/fathom";

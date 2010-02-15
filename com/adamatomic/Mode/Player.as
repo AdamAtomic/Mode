@@ -195,7 +195,7 @@ package com.adamatomic.Mode
 			if(_gibs != null)
 			{
 				_gibs.at(this);
-				_gibs.start(true,50);
+				_gibs.start(true,0,50);
 			}
 		}
 	}

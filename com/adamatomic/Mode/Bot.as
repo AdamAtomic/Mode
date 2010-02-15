@@ -6,19 +6,19 @@ package com.adamatomic.Mode
 
 	public class Bot extends FlxSprite
 	{
-		[Embed(source="../../../data/bot.png")] private var ImgBot:Class;
-		[Embed(source="../../../data/jet.png")] private var ImgJet:Class;
-		[Embed(source="../../../data/asplode.mp3")] private var SndExplode:Class;
-		[Embed(source="../../../data/hit.mp3")] private var SndHit:Class;
-		[Embed(source="../../../data/jet.mp3")] private var SndJet:Class;
+		[Embed(source="../../../data/bot.png")] protected var ImgBot:Class;
+		[Embed(source="../../../data/jet.png")] protected var ImgJet:Class;
+		[Embed(source="../../../data/asplode.mp3")] protected var SndExplode:Class;
+		[Embed(source="../../../data/hit.mp3")] protected var SndHit:Class;
+		[Embed(source="../../../data/jet.mp3")] protected var SndJet:Class;
 		
-		private var _gibs:FlxEmitter;
-		private var _jets:FlxEmitter;
-		private var _player:Player;
-		private var _timer:Number;
-		private var _b:Array;
-		static private var _cb:uint = 0;
-		private var _shotClock:Number;
+		protected var _gibs:FlxEmitter;
+		protected var _jets:FlxEmitter;
+		protected var _player:Player;
+		protected var _timer:Number;
+		protected var _b:Array;
+		static protected var _cb:uint = 0;
+		protected var _shotClock:Number;
 		
 		public function Bot(xPos:int,yPos:int,Bullets:Array,Gibs:FlxEmitter,ThePlayer:Player)
 		{
@@ -40,10 +40,9 @@ package com.adamatomic.Mode
 			
 			//Jet effect that shoots out from behind the bot
 			_jets = new FlxEmitter();
-			_jets.delay = 0.01;
 			_jets.setRotation();
 			_jets.gravity = 0;
-			_jets.createSprites(ImgJet,15);
+			_jets.createSprites(ImgJet,15,0,false);
 
 			reset(x,y);
 		}
@@ -54,7 +53,7 @@ package com.adamatomic.Mode
 			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
 			_timer += FlxG.elapsed;
 			if((ot < 8) && (_timer >= 8))
-				_jets.kill();
+				_jets.stop(1);
 
 			//Aiming
 			var dx:Number = x-_player.x;
@@ -78,14 +77,13 @@ package com.adamatomic.Mode
 				_timer = 0;
 			else if(_timer < 8)
 			{
-				if(!_jets.active)
-					_jets.start();
 				thrust = 40;
-				_jets.x = x + width/2;
-				_jets.y = y + height/2;
 				var v:FlxPoint = FlxU.rotatePoint(thrust,0,0,0,angle);
+				_jets.at(this);
 				_jets.setXSpeed(v.x-30,v.x+30);
 				_jets.setYSpeed(v.y-30,v.y+30);
+				if(!_jets.on)
+					_jets.start(false,0.01,0);
 			}
 
 			//Shooting
@@ -104,6 +102,7 @@ package com.adamatomic.Mode
 					shoot();
 			}
 			
+			_jets.update();
 			super.update();
 		}
 		
@@ -130,7 +129,7 @@ package com.adamatomic.Mode
 			flicker(-1);
 			_jets.kill();
 			_gibs.at(this);
-			_gibs.start(true,20);
+			_gibs.start(true,0,20);
 			FlxG.score += 200;
 		}
 		
@@ -146,7 +145,7 @@ package com.adamatomic.Mode
 			_shotClock = 0;
 		}
 		
-		private function shoot():void
+		protected function shoot():void
 		{
 			var ba:FlxPoint = FlxU.rotatePoint(-120,0,0,0,angle);
 			_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);

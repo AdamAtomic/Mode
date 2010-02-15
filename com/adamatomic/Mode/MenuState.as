@@ -84,7 +84,7 @@ package com.adamatomic.Mode
 				FlxG.quake.start(0.035,0.5);
 				_t1.color = 0xd8eba2;
 				_t2.color = 0xd8eba2;
-				_gibs.start(true,0,5);
+				_gibs.start(true,5);
 				_t1.angle = FlxU.random()*40-20;
 				_t2.angle = FlxU.random()*40-20;
 				
