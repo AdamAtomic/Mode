@@ -15,6 +15,7 @@ package com.adamatomic.Mode
 		private var _botGibs:FlxEmitter;
 		private var _gibs:FlxEmitter;
 		private var _player:Player;
+		private var _open:Boolean;
 		
 		public function Spawner(X:int, Y:int,Gibs:FlxEmitter,Bots:FlxGroup,BotBullets:Array,BotGibs:FlxEmitter,ThePlayer:Player)
 		{
@@ -26,10 +27,11 @@ package com.adamatomic.Mode
 			_botGibs = BotGibs;
 			_player = ThePlayer;
 			_timer = Math.random()*20;
+			_open = false;
 			health = 8;
 
 			addAnimation("open", [1, 2, 3, 4, 5], 40, false);
-			addAnimation("close", [5, 4, 3, 2, 1, 0], 40, false);
+			addAnimation("close", [4, 3, 2, 1, 0], 40, false);
 			addAnimation("dead", [6]);
 		}
 		
@@ -45,9 +47,21 @@ package com.adamatomic.Mode
 				makeBot();
 			}
 			else if(_timer > limit - 0.35)
-				play("open");
+			{
+				if(!_open)
+				{
+					_open = true;
+					play("open");
+				}
+			}
 			else if(_timer > 1)
-				play("close");
+			{
+				if(_open)
+				{
+					play("close");
+					_open = false;
+				}
+			}
 				
 			super.update();
 		}
@@ -76,7 +90,7 @@ package com.adamatomic.Mode
 			FlxG.flash.start(0xffd8eba2,0.35);
 			makeBot();
 			_gibs.at(this);
-			_gibs.start(true,2,0);
+			_gibs.start(true,3,0);
 			FlxG.score += 1000;
 		}
 		

@@ -53,7 +53,7 @@ package com.adamatomic.Mode
 			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
 			_timer += FlxG.elapsed;
 			if((ot < 8) && (_timer >= 8))
-				_jets.stop(1);
+				_jets.stop(0.1);
 
 			//Aiming
 			var dx:Number = x-_player.x;

@@ -56,6 +56,10 @@ package com.adamatomic.Mode
 			super.update();
 			_tilemap.collide(_player);
 			_tilemap.collide(_bullets);
+			
+			//Toggle the bounding box visibility
+			if(FlxG.keys.justPressed("B"))
+				FlxG.showBounds = !FlxG.showBounds;
 		}
 	}
 }

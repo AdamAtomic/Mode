@@ -50,16 +50,16 @@ package com.adamatomic.Mode
 			
 			//get the gibs set up and out of the way
 			_littleGibs = new FlxEmitter();
-			_littleGibs.delay = 1.5;
+			_littleGibs.delay = 3;
 			_littleGibs.setXSpeed(-150,150);
 			_littleGibs.setYSpeed(-200,0);
 			_littleGibs.setRotation(-720,-720);
-			_littleGibs.createSprites(ImgGibs,100,10,true,0.5);
+			_littleGibs.createSprites(ImgGibs,100,10,true,0.5,0.65);
 			_bigGibs = new FlxEmitter();
 			_bigGibs.setXSpeed(-200,200);
 			_bigGibs.setYSpeed(-300,0);
 			_bigGibs.setRotation(-720,-720);
-			_bigGibs.createSprites(ImgSpawnerGibs,50,20,true,0.5);
+			_bigGibs.createSprites(ImgSpawnerGibs,50,20,true,0.5,0.35);
 			
 			//level generation needs to know about the spawners (and thusly the bots, players, etc)
 			_blocks = new FlxGroup();
@@ -192,6 +192,7 @@ package com.adamatomic.Mode
 				tmp.addAnimation("on",[0]);
 				tmp.addAnimation("off",[1]);
 				tmp.moves = false;
+				tmp.solid = false;
 				tmp.play("on");
 				_notches.push(this.add(tmp));
 			}
@@ -297,6 +298,10 @@ package com.adamatomic.Mode
 			
 			if(reload)
 				FlxG.state = new PlayState();
+			
+			//Toggle the bounding box visibility
+			if(FlxG.keys.justPressed("B"))
+				FlxG.showBounds = !FlxG.showBounds;
 		}
 
 		protected function overlapped(Object1:FlxObject,Object2:FlxObject):void
@@ -356,18 +361,18 @@ package com.adamatomic.Mode
 				var b:FlxTileblock;
 				
 				b = new FlxTileblock(RX+bx*8,RY+by*8,bw*8,bh*8);
-				b.loadGraphic(ImgTech);
+				b.loadTiles(ImgTech);
 				_blocks.add(b);
 				
 				//If the block has room, add some non-colliding "dirt" graphics for variety
 				if((bw >= 4) && (bh >= 5))
 				{
 					b = new FlxTileblock(RX+bx*8+8,RY+by*8,bw*8-16,8);
-					b.loadGraphic(ImgDirtTop);
+					b.loadTiles(ImgDirtTop);
 					_decorations.add(b);
 					
 					b = new FlxTileblock(RX+bx*8+8,RY+by*8+8,bw*8-16,bh*8-24);
-					b.loadGraphic(ImgDirt);
+					b.loadTiles(ImgDirt);
 					_decorations.add(b);
 				}
 			}
