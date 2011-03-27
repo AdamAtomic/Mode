@@ -30,11 +30,6 @@ package com.adamatomic.Mode
 			if(dead && finished) exists = false;
 			else super.update();
 		}
-		
-		override public function render():void
-		{
-			super.render();
-		}
 
 		override public function hitSide(Contact:FlxObject,Velocity:Number):void { kill(); }
 		override public function hitBottom(Contact:FlxObject,Velocity:Number):void { kill(); }

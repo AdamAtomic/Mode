@@ -1,6 +1,14 @@
-package { import org.flixel.FlxPreloader; public class Preloader extends FlxPreloader { public function Preloader():void {
+package
+{
+	import org.flixel.helpers.FlxPreloader;
 	
-	className = "Mode";
-	//myURL = "adamatomic.com/mode";
-	super();
-}}}
+	public class Preloader extends FlxPreloader
+	{
+		public function Preloader():void
+		{
+			className = "Mode";
+			//myURL = "adamatomic.com/mode";
+			super();
+		}
+	}
+}

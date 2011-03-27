@@ -106,10 +106,10 @@ package com.adamatomic.Mode
 			super.update();
 		}
 		
-		override public function render():void
+		override public function draw():void
 		{
-			_jets.render();
-			super.render();
+			_jets.draw();
+			super.draw();
 		}
 		
 		override public function hurt(Damage:Number):void
