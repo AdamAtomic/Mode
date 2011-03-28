@@ -26,7 +26,7 @@ package com.adamatomic.Mode
 			_botBullets = BotBullets;
 			_botGibs = BotGibs;
 			_player = ThePlayer;
-			_timer = Math.random()*20;
+			_timer = FlxG.random()*20;
 			_open = false;
 			health = 8;
 

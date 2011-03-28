@@ -18,6 +18,11 @@ package com.adamatomic.Mode
 		
 		override public function create():void
 		{
+			FlxG.framerate = 40;
+			FlxG.flashFramerate = 40;
+			//FlxG.setDebuggerLayout(FlxG.DEBUGGER_MICRO);
+			FlxG.log(FlxG.globalSeed);
+			
 			var i:uint;
 			var s:FlxSprite;
 			
@@ -85,8 +90,8 @@ package com.adamatomic.Mode
 				_t1.color = 0xd8eba2;
 				_t2.color = 0xd8eba2;
 				_gibs.start(true,5);
-				_t1.angle = FlxU.random()*40-20;
-				_t2.angle = FlxU.random()*40-20;
+				_t1.angle = FlxG.random()*40-20;
+				_t2.angle = FlxG.random()*40-20;
 				
 				var t1:FlxText;
 				var t2:FlxText;

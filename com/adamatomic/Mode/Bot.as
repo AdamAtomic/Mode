@@ -19,6 +19,7 @@ package com.adamatomic.Mode
 		protected var _b:Array;
 		static protected var _cb:uint = 0;
 		protected var _shotClock:Number;
+		protected var _thrust:Number;
 		
 		public function Bot(xPos:int,yPos:int,Bullets:Array,Gibs:FlxEmitter,ThePlayer:Player)
 		{
@@ -34,9 +35,9 @@ package com.adamatomic.Mode
 			offset.y = 2;
 			maxAngular = 120;
 			angularDrag = 400;
-			maxThrust = 100;
 			drag.x = 80;
 			drag.y = 80;
+			_thrust = 0;
 			
 			//Jet effect that shoots out from behind the bot
 			_jets = new FlxEmitter();
@@ -48,7 +49,7 @@ package com.adamatomic.Mode
 		}
 		
 		override public function update():void
-		{			
+		{
 			var ot:Number = _timer;
 			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
 			_timer += FlxG.elapsed;
@@ -56,9 +57,7 @@ package com.adamatomic.Mode
 				_jets.stop(0.1);
 
 			//Aiming
-			var dx:Number = x-_player.x;
-			var dy:Number = y-_player.y;
-			var da:Number = FlxU.getAngle(dx,dy);
+			var da:Number = FlxU.getAngle(this,_player);
 			if(da < 0)
 				da += 360;
 			var ac:Number = angle;
@@ -72,16 +71,16 @@ package com.adamatomic.Mode
 				angularAcceleration = 0;
 
 			//Jets
-			thrust = 0;
 			if(_timer > 9)
 				_timer = 0;
 			else if(_timer < 8)
 			{
-				thrust = 40;
-				var v:FlxPoint = FlxU.rotatePoint(thrust,0,0,0,angle);
+				velocity.x = velocity.y = 0;
+				_thrust = FlxU.computeVelocity(_thrust,120,0,60);
+				FlxU.rotatePoint(0,_thrust,0,0,angle,velocity);
 				_jets.at(this);
-				_jets.setXSpeed(v.x-30,v.x+30);
-				_jets.setYSpeed(v.y-30,v.y+30);
+				_jets.setXSpeed(-velocity.x-30,-velocity.x+30);
+				_jets.setYSpeed(-velocity.y-30,-velocity.y+30);
 				if(!_jets.on)
 					_jets.start(false,0.01,0);
 			}
@@ -136,10 +135,9 @@ package com.adamatomic.Mode
 		override public function reset(X:Number, Y:Number):void
 		{
 			super.reset(X,Y);
-			thrust = 0;
 			velocity.x = 0;
 			velocity.y = 0;
-			angle = Math.random()*360 - 180;
+			angle = FlxG.random()*360 - 180;
 			health = 2;
 			_timer = 0;
 			_shotClock = 0;
@@ -147,7 +145,7 @@ package com.adamatomic.Mode
 		
 		protected function shoot():void
 		{
-			var ba:FlxPoint = FlxU.rotatePoint(-120,0,0,0,angle);
+			var ba:FlxPoint = FlxU.rotatePoint(0,120,0,0,angle);
 			_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
 			if(++_cb >= _b.length) _cb = 0;
 		}
