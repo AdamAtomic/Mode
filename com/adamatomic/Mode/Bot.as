@@ -48,16 +48,21 @@ package com.adamatomic.Mode
 			reset(x,y);
 		}
 		
+		override public function destroy():void
+		{
+			_gibs = null;
+			_jets.destroy();
+			_jets = null;
+			_player = null;
+			_b = null;
+		}
+		
 		override public function update():void
 		{
-			var ot:Number = _timer;
-			if((_timer == 0) && onScreen()) FlxG.play(SndJet);
-			_timer += FlxG.elapsed;
-			if((ot < 8) && (_timer >= 8))
-				_jets.stop(0.1);
-
-			//Aiming
+			//First, figure out the angle from this bot to the player
 			var da:Number = FlxU.getAngle(this,_player);
+			
+			//Then, rotate toward that angle
 			if(da < 0)
 				da += 360;
 			var ac:Number = angle;
@@ -70,40 +75,55 @@ package com.adamatomic.Mode
 			else
 				angularAcceleration = 0;
 
-			//Jets
-			if(_timer > 9)
+			//Figure out if the jets are on or not.
+			_timer += FlxG.elapsed;
+			if(_timer > 8)
 				_timer = 0;
-			else if(_timer < 8)
+			var jetsOn:Boolean = _timer < 6;
+			
+			//Set the bot's movement speed and direction
+			//based on angle and whether the jets are on.
+			_thrust = FlxU.computeVelocity(_thrust,(jetsOn?90:0),40,60);
+			FlxU.rotatePoint(0,_thrust,0,0,angle,velocity);
+			
+			//Aim and operate the "jet poof" particles that come out the back of the robot
+			if(jetsOn)
 			{
-				velocity.x = velocity.y = 0;
-				_thrust = FlxU.computeVelocity(_thrust,120,0,60);
-				FlxU.rotatePoint(0,_thrust,0,0,angle,velocity);
+				if(!_jets.on)
+				{
+					_jets.start(false,0.01,0);
+					if(onScreen())
+						FlxG.play(SndJet);
+				}
 				_jets.at(this);
 				_jets.setXSpeed(-velocity.x-30,-velocity.x+30);
 				_jets.setYSpeed(-velocity.y-30,-velocity.y+30);
-				if(!_jets.on)
-					_jets.start(false,0.01,0);
 			}
-			else
-			{
-				velocity.x *= 0.65;
-				velocity.y *= 0.65;
-			}
+			else if(_jets.on)
+				_jets.stop(0.1);
 
-			//Shooting
+			//Shooting - three shots every few seconds
 			if(onScreen())
 			{
+				var shoot:Boolean = false;
 				var os:Number = _shotClock;
 				_shotClock += FlxG.elapsed;
 				if((os < 4.0) && (_shotClock >= 4.0))
 				{
 					_shotClock = 0;
-					shoot();
+					shoot = true;
 				}
 				else if((os < 3.5) && (_shotClock >= 3.5))
-					shoot();
+					shoot = true;
 				else if((os < 3.0) && (_shotClock >= 3.0))
-					shoot();
+					shoot = true;
+
+				if(shoot) //actually shoot a bullet out along the angle of the bot
+				{
+					var ba:FlxPoint = FlxU.rotatePoint(0,120,0,0,angle);
+					_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
+					if(++_cb >= _b.length) _cb = 0;
+				}
 			}
 			
 			_jets.update();
@@ -146,13 +166,6 @@ package com.adamatomic.Mode
 			health = 2;
 			_timer = 0;
 			_shotClock = 0;
-		}
-		
-		protected function shoot():void
-		{
-			var ba:FlxPoint = FlxU.rotatePoint(0,120,0,0,angle);
-			_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
-			if(++_cb >= _b.length) _cb = 0;
 		}
 	}
 }

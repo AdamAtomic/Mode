@@ -1,22 +1,27 @@
 package com.adamatomic.Mode
 {
+	import flash.net.SharedObject;
+	
 	import org.flixel.*;
 
 	public class MenuState extends FlxState
 	{
-		[Embed(source="../../../data/spawner_gibs.png")] private var ImgGibs:Class;
-		[Embed(source="../../../data/cursor.png")] private var ImgCursor:Class;
-		[Embed(source="../../../data/menu_hit.mp3")] private var SndHit:Class;
-		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndHit2:Class;
+		[Embed(source="../../../data/spawner_gibs.png")] public var ImgGibs:Class;
+		[Embed(source="../../../data/cursor.png")] public var ImgCursor:Class;
+		[Embed(source="../../../data/menu_hit.mp3")] public var SndHit:Class;
+		[Embed(source="../../../data/menu_hit_2.mp3")] public var SndHit2:Class;
 		
-		[Embed(source="../../../data/attract.fgr",mimeType="application/octet-stream")] protected var Attract:Class;
+		[Embed(source="../../../data/attract1.fgr",mimeType="application/octet-stream")] public var Attract1:Class;
+		[Embed(source="../../../data/attract2.fgr",mimeType="application/octet-stream")] public var Attract2:Class;
 		
-		private var _gibs:FlxEmitter;
-		private var _b:FlxButton;
-		private var _t1:FlxText;
-		private var _t2:FlxText;
-		private var _ok:Boolean;
-		private var _ok2:Boolean;
+		public var gibs:FlxEmitter;
+		public var button1:FlxButton;
+		public var title1:FlxText;
+		public var title2:FlxText;
+		public var ok:Boolean;
+		public var ok2:Boolean;
+		public var timer:Number;
+		public var attractMode:Boolean;
 		
 		override public function create():void
 		{
@@ -28,127 +33,134 @@ package com.adamatomic.Mode
 			var i:uint;
 			var s:FlxSprite;
 			
-			_gibs = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10);
-			_gibs.setSize(100,30);
-			_gibs.setYSpeed(-200,-20);
-			_gibs.setRotation(-720,720);
-			_gibs.gravity = 100;
-			_gibs.createSprites(ImgGibs,1000,32);
-			add(_gibs);
+			gibs = new FlxEmitter(FlxG.width/2-50,FlxG.height/2-10);
+			gibs.setSize(100,30);
+			gibs.setYSpeed(-200,-20);
+			gibs.setRotation(-720,720);
+			gibs.gravity = 100;
+			gibs.createSprites(ImgGibs,1000,32);
+			add(gibs);
 				
-			_t1 = new FlxText(FlxG.width,FlxG.height/3,80,"mo");
-			_t1.size = 32;
-			_t1.color = 0x3a5c39;
-			_t1.antialiasing = true;
-			add(_t1);
+			title1 = new FlxText(FlxG.width,FlxG.height/3,80,"mo");
+			title1.size = 32;
+			title1.color = 0x3a5c39;
+			title1.antialiasing = true;
+			add(title1);
 
-			_t2 = new FlxText(-60,FlxG.height/3,80,"de");
-			_t2.size = _t1.size;
-			_t2.color = _t1.color;
-			_t2.antialiasing = _t1.antialiasing;
-			add(_t2);
+			title2 = new FlxText(-60,title1.y,title1.width,"de");
+			title2.size = title1.size;
+			title2.color = title1.color;
+			title2.antialiasing = title1.antialiasing;
+			add(title2);
 			
-			_ok = false;
-			_ok2 = false;
+			ok = false;
+			ok2 = false;
 			
 			FlxG.mouse.show(ImgCursor);
 			
-			//Simple use of flixel save game object
+			//Simple use of flixel save game object.
+			//Tracks number of times the game has been played.
 			var save:FlxSave = new FlxSave();
 			if(save.bind("Mode"))
 			{
 				if(save.data.plays == null)
-					save.data.plays = 0;
+					save.data.plays = 0 as Number;
 				else
 					save.data.plays++;
 				FlxG.log("Number of plays: "+save.data.plays);
+				//save.erase();
+				save.close();
 			}
+			
+			timer = 0;
+			attractMode = false;
 		}
 
 		override public function update():void
 		{
-			if(FlxG.keys.justPressed("A"))
-				FlxG.loadReplay(new Attract(),new PlayState());
-
 			//Slides the text ontot he screen
 			var t1m:uint = FlxG.width/2-54;
-			if(_t1.x > t1m)
+			if(title1.x > t1m)
 			{
-				_t1.x -= FlxG.elapsed*FlxG.width;
-				if(_t1.x < t1m) _t1.x = t1m;
+				title1.x -= FlxG.elapsed*FlxG.width;
+				if(title1.x < t1m) title1.x = t1m;
 			}
 			var t2m:uint = FlxG.width/2+6;
-			if(_t2.x < t2m)
+			if(title2.x < t2m)
 			{
-				_t2.x += FlxG.elapsed*FlxG.width;
-				if(_t2.x > t2m) _t2.x = t2m;
+				title2.x += FlxG.elapsed*FlxG.width;
+				if(title2.x > t2m) title2.x = t2m;
 			}
 			
 			//Check to see if the text is in position
-			if(!_ok && ((_t1.x == t1m) || (_t2.x == t2m)))
+			if(!ok && ((title1.x == t1m) || (title2.x == t2m)))
 			{
 				//explosion
-				_ok = true;
+				ok = true;
 				FlxG.play(SndHit);
 				FlxG.flash.start(0xffd8eba2,0.5);
 				FlxG.quake.start(0.035,0.5);
-				_t1.color = 0xd8eba2;
-				_t2.color = 0xd8eba2;
-				_gibs.start(true,5);
-				_t1.angle = FlxG.random()*40-20;
-				_t2.angle = FlxG.random()*40-20;
+				title1.color = 0xd8eba2;
+				title2.color = 0xd8eba2;
+				gibs.start(true,5);
+				title1.angle = FlxG.random()*40-20;
+				title2.angle = FlxG.random()*40-20;
 				
-				var t1:FlxText;
-				var t2:FlxText;
-				var b:FlxButton;
+				var text1:FlxText;
+				var text2:FlxText;
+				var button2:FlxButton;
 				
-				t1 = new FlxText(t1m,FlxG.height/3+39,110,"by Adam Atomic")
-				t1.alignment = "center";
-				t1.color = 0x3a5c39;
-				add(t1);
+				text1 = new FlxText(t1m,FlxG.height/3+39,110,"by Adam Atomic")
+				text1.alignment = "center";
+				text1.color = 0x3a5c39;
+				add(text1);
 				
 				//flixel button
 				this.add((new FlxSprite(t1m+1,FlxG.height/3+53)).createGraphic(106,19,0xff131c1b));
-				b = new FlxButton(t1m+2,FlxG.height/3+54,onFlixel);
-				b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
-				t1 = new FlxText(15,1,100,"www.flixel.org");
-				t1.color = 0x729954;
-				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
-				t2.color = 0xd8eba2;
-				b.loadText(t1,t2);
-				add(b);
+				button2 = new FlxButton(t1m+2,FlxG.height/3+54,onFlixel);
+				button2.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				text1 = new FlxText(15,1,100,"www.flixel.org");
+				text1.color = 0x729954;
+				text2 = new FlxText(text1.x,text1.y,text1.width,text1.text);
+				text2.color = 0xd8eba2;
+				button2.loadText(text1,text2);
+				add(button2);
 				
 				//danny B button
 				this.add((new FlxSprite(t1m+1,FlxG.height/3+75)).createGraphic(106,19,0xff131c1b));
-				b = new FlxButton(t1m+2,FlxG.height/3+76,onDanny);
-				b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
-				t1 = new FlxText(8,1,100,"music by danny B");
-				t1.color = 0x729954;
-				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
-				t2.color = 0xd8eba2;
-				b.loadText(t1,t2);
-				add(b);
+				button2 = new FlxButton(t1m+2,FlxG.height/3+76,onDanny);
+				button2.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				text1 = new FlxText(8,1,100,"music by danny B");
+				text1.color = 0x729954;
+				text2 = new FlxText(text1.x,text1.y,text1.width,text1.text);
+				text2.color = 0xd8eba2;
+				button2.loadText(text1,text2);
+				add(button2);
 				
 				//play button
 				this.add((new FlxSprite(t1m+1,FlxG.height/3+137)).createGraphic(106,19,0xff131c1b));
-				t1 = new FlxText(t1m,FlxG.height/3+139,110,"PRESS X+C TO PLAY.");
-				t1.color = 0x729954;
-				t1.alignment = "center";
-				add(t1);
-				_b = new FlxButton(t1m+2,FlxG.height/3+138,onButton);
-				_b.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
-				t1 = new FlxText(25,1,100,"CLICK HERE");
-				t1.color = 0x729954;
-				t2 = new FlxText(t1.x,t1.y,t1.width,t1.text);
-				t2.color = 0xd8eba2;
-				_b.loadText(t1,t2);
-				add(_b);
+				text1 = new FlxText(t1m,FlxG.height/3+139,110,"PRESS X+C TO PLAY.");
+				text1.color = 0x729954;
+				text1.alignment = "center";
+				add(text1);
+				button1 = new FlxButton(t1m+2,FlxG.height/3+138,onButton);
+				button1.loadGraphic((new FlxSprite()).createGraphic(104,15,0xff3a5c39),(new FlxSprite()).createGraphic(104,15,0xff729954));
+				text1 = new FlxText(25,1,100,"CLICK HERE");
+				text1.color = 0x729954;
+				text2 = new FlxText(text1.x,text1.y,text1.width,text1.text);
+				text2.color = 0xd8eba2;
+				button1.loadText(text1,text2);
+				add(button1);
 			}
-			
-			//X + C were pressed, fade out and change to play state
-			if(_ok && !_ok2 && FlxG.keys.X && FlxG.keys.C)
+
+			//X + C were pressed, fade out and change to play state.
+			//Alternatively, if we sat on the menu too long, launch the attract mode instead!
+			timer += FlxG.elapsed;
+			if(timer >= 10) //go into demo mode if no buttons are pressed for 10 seconds
+				attractMode = true;
+			if(!ok2 && ((ok && !ok2 && FlxG.keys.X && FlxG.keys.C) || attractMode)) 
 			{
-				_ok2 = true;
+				ok2 = true;
 				FlxG.play(SndHit2);
 				FlxG.flash.start(0xffd8eba2,0.5);
 				FlxG.fade.start(0xff131c1b,1,onFade);
@@ -157,27 +169,35 @@ package com.adamatomic.Mode
 			super.update();
 		}
 		
-		private function onFlixel():void
+		public function onFlixel():void
 		{
 			FlxU.openURL("http://flixel.org");
 		}
 		
-		private function onDanny():void
+		public function onDanny():void
 		{
 			FlxU.openURL("http://dbsoundworks.com");
 		}
 		
-		private function onButton():void
+		public function onButton():void
 		{
-			_b.visible = false;
-			_b.active = false;
+			button1.visible = false;
+			button1.active = false;
 			FlxG.play(SndHit2);
 		}
 		
-		private function onFade():void
+		public function onFade():void
 		{
-			FlxG.state = new PlayState();
+			if(attractMode)
+				FlxG.loadReplay((FlxG.random()<0.5)?(new Attract1()):(new Attract2()),new PlayState(),["X","C"],10,onDemoComplete);
+			else
+				FlxG.state = new PlayState();
 			//FlxG.state = new PlayStateTiles();
+		}
+		
+		public function onDemoComplete():void
+		{
+			FlxG.fade.start(0xff131c1b,1,FlxG.resetGame);
 		}
 	}
 }
