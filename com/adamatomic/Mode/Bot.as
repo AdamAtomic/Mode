@@ -84,6 +84,11 @@ package com.adamatomic.Mode
 				if(!_jets.on)
 					_jets.start(false,0.01,0);
 			}
+			else
+			{
+				velocity.x *= 0.65;
+				velocity.y *= 0.65;
+			}
 
 			//Shooting
 			if(onScreen())

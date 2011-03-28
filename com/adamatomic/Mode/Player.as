@@ -154,6 +154,8 @@ package com.adamatomic.Mode
 				if(FlxG.keys.justPressed("C"))
 					FlxG.play(SndJam);
 			}
+			
+			trace(x + ", " + y);
 		}
 		
 		override public function hitBottom(Contact:FlxObject,Velocity:Number):void

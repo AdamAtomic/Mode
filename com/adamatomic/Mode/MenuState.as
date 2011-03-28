@@ -9,6 +9,8 @@ package com.adamatomic.Mode
 		[Embed(source="../../../data/menu_hit.mp3")] private var SndHit:Class;
 		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndHit2:Class;
 		
+		[Embed(source="../../../data/attract.fgr",mimeType="application/octet-stream")] protected var Attract:Class;
+		
 		private var _gibs:FlxEmitter;
 		private var _b:FlxButton;
 		private var _t1:FlxText;
@@ -21,7 +23,7 @@ package com.adamatomic.Mode
 			FlxG.framerate = 40;
 			FlxG.flashFramerate = 40;
 			//FlxG.setDebuggerLayout(FlxG.DEBUGGER_MICRO);
-			FlxG.log(FlxG.globalSeed);
+			//FlxG.log(FlxG.globalSeed);
 			
 			var i:uint;
 			var s:FlxSprite;
@@ -65,6 +67,9 @@ package com.adamatomic.Mode
 
 		override public function update():void
 		{
+			if(FlxG.keys.justPressed("A"))
+				FlxG.loadReplay(new Attract(),new PlayState());
+
 			//Slides the text ontot he screen
 			var t1m:uint = FlxG.width/2-54;
 			if(_t1.x > t1m)

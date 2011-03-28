@@ -45,8 +45,6 @@ package com.adamatomic.Mode
 		
 		override public function create():void
 		{			
-			FlxG.log(FlxG.globalSeed);
-			
 			FlxG.mouse.hide();
 			reload = false;
 			
