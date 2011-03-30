@@ -206,7 +206,7 @@ package
 				return;
 			FlxG.play(SndExplode);
 			super.kill();
-			flicker(-1);
+			flicker(0);
 			_jets.kill();
 			_gibs.at(this);
 			_gibs.start(true,3,0,20);

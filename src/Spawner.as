@@ -94,7 +94,7 @@ package
 			active = false;
 			exists = true;
 			solid = false;
-			flicker(-1);
+			flicker(0);
 			play("dead");
 			FlxG.quake.start(0.005,0.35);
 			FlxG.flash.start(0xffd8eba2,0.35);

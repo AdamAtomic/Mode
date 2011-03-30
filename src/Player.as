@@ -119,7 +119,7 @@ package
 			}
 			
 			//SHOOTING
-			if(!flickering() && FlxG.keys.justPressed("C"))
+			if(!flickering && FlxG.keys.justPressed("C"))
 			{
 				getMidpoint(_point);
 				(_bullets.recycle(Bullet) as Bullet).shoot(_point,_aim);
@@ -131,7 +131,7 @@ package
 			super.update();
 
 			//Jammed, can't fire!
-			if(flickering())
+			if(flickering)
 			{
 				if(FlxG.keys.justPressed("C"))
 					FlxG.play(SndJam);
@@ -149,7 +149,7 @@ package
 		override public function hurt(Damage:Number):void
 		{
 			Damage = 0;
-			if(flickering())
+			if(flickering)
 				return;
 			FlxG.play(SndHurt);
 			flicker(1.3);
@@ -169,7 +169,7 @@ package
 			FlxG.play(SndExplode);
 			FlxG.play(SndExplode2);
 			super.kill();
-			flicker(-1);
+			flicker(0);
 			exists = true;
 			visible = false;
 			FlxG.quake.start(0.005,0.35);

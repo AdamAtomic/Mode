@@ -212,7 +212,7 @@ package
 			FlxU.overlap(_bullets,_hazards,overlapped);
 			
 			//Jammed message
-			if(FlxG.keys.justPressed("C") && _player.flickering())
+			if(FlxG.keys.justPressed("C") && _player.flickering)
 			{
 				_jamTimer = 1;
 				_jamBar.visible = true;
@@ -220,7 +220,7 @@ package
 			}
 			if(_jamTimer > 0)
 			{
-				if(!_player.flickering()) _jamTimer = 0;
+				if(!_player.flickering) _jamTimer = 0;
 				_jamTimer -= FlxG.elapsed;
 				if(_jamTimer < 0)
 				{
