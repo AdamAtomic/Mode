@@ -1,11 +1,11 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class VictoryState extends FlxState
 	{
-		[Embed(source="../../../data/spawner_gibs.png")] private var ImgGibs:Class;
-		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndMenu:Class;
+		[Embed(source="data/spawner_gibs.png")] private var ImgGibs:Class;
+		[Embed(source="data/menu_hit_2.mp3")] private var SndMenu:Class;
 		
 		private var _timer:Number;
 		private var _fading:Boolean;
@@ -23,9 +23,9 @@ package com.adamatomic.Mode
 			gibs.setYSpeed(0,100);
 			gibs.setRotation(-360,360);
 			gibs.gravity = 80;
-			gibs.createSprites(ImgGibs,800,32);
+			gibs.makeParticles(ImgGibs,800,32,true,0,0);
 			add(gibs);
-			gibs.start(false,0.005);
+			gibs.start(false,0,0.005);
 			
 			add((new FlxText(0,FlxG.height/2-35,FlxG.width,"VICTORY\n\nSCORE: "+FlxG.score)).setFormat(null,16,0xd8eba2,"center"));
 		}
@@ -47,7 +47,7 @@ package com.adamatomic.Mode
 		
 		private function onPlay():void 
 		{
-			FlxG.state = new PlayState();
+			FlxG.switchState(new PlayState());
 		}
 	}
 }

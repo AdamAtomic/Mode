@@ -1,51 +1,54 @@
-package com.adamatomic.Mode
+package
 {
 	import flash.geom.Point;
 	
 	import org.flixel.*;
 
-	public class Bot extends FlxSprite
+	public class Enemy extends FlxSprite
 	{
-		[Embed(source="../../../data/bot.png")] protected var ImgBot:Class;
-		[Embed(source="../../../data/jet.png")] protected var ImgJet:Class;
-		[Embed(source="../../../data/asplode.mp3")] protected var SndExplode:Class;
-		[Embed(source="../../../data/hit.mp3")] protected var SndHit:Class;
-		[Embed(source="../../../data/jet.mp3")] protected var SndJet:Class;
+		[Embed(source="data/bot.png")] protected var ImgBot:Class;
+		[Embed(source="data/jet.png")] protected var ImgJet:Class;
+		[Embed(source="data/asplode.mp3")] protected var SndExplode:Class;
+		[Embed(source="data/hit.mp3")] protected var SndHit:Class;
+		[Embed(source="data/jet.mp3")] protected var SndJet:Class;
 		
 		protected var _gibs:FlxEmitter;
 		protected var _jets:FlxEmitter;
 		protected var _player:Player;
 		protected var _timer:Number;
-		protected var _b:Array;
-		static protected var _cb:uint = 0;
+		protected var _b:FlxGroup;
 		protected var _shotClock:Number;
 		protected var _thrust:Number;
 		
-		public function Bot(xPos:int,yPos:int,Bullets:Array,Gibs:FlxEmitter,ThePlayer:Player)
+		public function Enemy()
 		{
-			super(xPos,yPos);
-			loadRotatedGraphic(ImgBot,32,0);
-			_player = ThePlayer;
-			_b = Bullets;
-			_gibs = Gibs;
-			
+			super();
+			loadRotatedGraphic(ImgBot,64,0); //Load the 
+
 			width = 12;
 			height = 12;
 			offset.x = 2;
 			offset.y = 2;
+			
 			maxAngular = 120;
 			angularDrag = 400;
 			drag.x = 80;
 			drag.y = 80;
 			_thrust = 0;
-			
-			//Jet effect that shoots out from behind the bot
+
 			_jets = new FlxEmitter();
 			_jets.setRotation();
 			_jets.gravity = 0;
-			_jets.createSprites(ImgJet,15,0,false);
-
-			reset(x,y);
+			_jets.makeParticles(ImgJet,15,0,false,0,0);
+		}
+		
+		public function init(xPos:int,yPos:int,Bullets:FlxGroup,Gibs:FlxEmitter,ThePlayer:Player):void
+		{
+			_player = ThePlayer;
+			_b = Bullets;
+			_gibs = Gibs;
+			
+			reset(xPos - width/2,yPos - height/2);
 		}
 		
 		override public function destroy():void
@@ -60,7 +63,7 @@ package com.adamatomic.Mode
 		override public function update():void
 		{
 			//First, figure out the angle from this bot to the player
-			var da:Number = FlxU.getAngle(this,_player);
+			var da:Number = FlxU.getAngle(getMidpoint(),_player.getMidpoint());
 			
 			//Then, rotate toward that angle
 			if(da < 0)
@@ -99,8 +102,8 @@ package com.adamatomic.Mode
 				_jets.setXSpeed(-velocity.x-30,-velocity.x+30);
 				_jets.setYSpeed(-velocity.y-30,-velocity.y+30);
 			}
-			else if(_jets.on)
-				_jets.stop(0.1);
+			else
+				_jets.on = false;
 
 			//Shooting - three shots every few seconds
 			if(onScreen())
@@ -121,8 +124,7 @@ package com.adamatomic.Mode
 				if(shoot) //actually shoot a bullet out along the angle of the bot
 				{
 					var ba:FlxPoint = FlxU.rotatePoint(0,120,0,0,angle);
-					_b[_cb].shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
-					if(++_cb >= _b.length) _cb = 0;
+					(_b.recycle(BotBullet) as BotBullet).shoot(x+width/2-2,y+height/2-2,ba.x,ba.y);
 				}
 			}
 			
@@ -146,14 +148,14 @@ package com.adamatomic.Mode
 		
 		override public function kill():void
 		{
-			if(dead)
+			if(!alive)
 				return;
 			FlxG.play(SndExplode);
 			super.kill();
 			flicker(-1);
 			_jets.kill();
 			_gibs.at(this);
-			_gibs.start(true,0,20);
+			_gibs.start(true,3,0,20);
 			FlxG.score += 200;
 		}
 		

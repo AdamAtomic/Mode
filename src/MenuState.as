@@ -1,4 +1,4 @@
-package com.adamatomic.Mode
+package
 {
 	import flash.net.SharedObject;
 	
@@ -6,13 +6,13 @@ package com.adamatomic.Mode
 
 	public class MenuState extends FlxState
 	{
-		[Embed(source="../../../data/spawner_gibs.png")] public var ImgGibs:Class;
-		[Embed(source="../../../data/cursor.png")] public var ImgCursor:Class;
-		[Embed(source="../../../data/menu_hit.mp3")] public var SndHit:Class;
-		[Embed(source="../../../data/menu_hit_2.mp3")] public var SndHit2:Class;
+		[Embed(source="data/spawner_gibs.png")] public var ImgGibs:Class;
+		[Embed(source="data/cursor.png")] public var ImgCursor:Class;
+		[Embed(source="data/menu_hit.mp3")] public var SndHit:Class;
+		[Embed(source="data/menu_hit_2.mp3")] public var SndHit2:Class;
 		
-		[Embed(source="../../../data/attract1.fgr",mimeType="application/octet-stream")] public var Attract1:Class;
-		[Embed(source="../../../data/attract2.fgr",mimeType="application/octet-stream")] public var Attract2:Class;
+		[Embed(source="data/attract1.fgr",mimeType="application/octet-stream")] public var Attract1:Class;
+		[Embed(source="data/attract2.fgr",mimeType="application/octet-stream")] public var Attract2:Class;
 		
 		public var gibs:FlxEmitter;
 		public var playButton:FlxButton
@@ -38,7 +38,7 @@ package com.adamatomic.Mode
 			gibs.setYSpeed(-200,-20);
 			gibs.setRotation(-720,720);
 			gibs.gravity = 100;
-			gibs.createSprites(ImgGibs,1000,32);
+			gibs.makeParticles(ImgGibs,1000,32,true,0,0);
 			add(gibs);
 				
 			title1 = new FlxText(FlxG.width,FlxG.height/3,80,"mo");
@@ -78,7 +78,7 @@ package com.adamatomic.Mode
 
 		override public function update():void
 		{
-			//Slides the text ontot he screen
+			//Slides the text onto the screen
 			var t1m:uint = FlxG.width/2-54;
 			if(title1.x > t1m)
 			{
@@ -167,8 +167,7 @@ package com.adamatomic.Mode
 			if(attractMode)
 				FlxG.loadReplay((FlxG.random()<0.5)?(new Attract1()):(new Attract2()),new PlayState(),["ANY"],15,onDemoComplete);
 			else
-				FlxG.state = new PlayState();
-				//FlxG.state = new PlayStateTiles();
+				FlxG.switchState(new PlayState());
 		}
 		
 		public function onDemoComplete():void

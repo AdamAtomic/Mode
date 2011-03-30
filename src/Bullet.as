@@ -1,12 +1,14 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class Bullet extends FlxSprite
 	{
-		[Embed(source="../../../data/bullet.png")] private var ImgBullet:Class;
-		[Embed(source="../../../data/jump.mp3")] private var SndHit:Class;
-		[Embed(source="../../../data/shoot.mp3")] private var SndShoot:Class;
+		[Embed(source="data/bullet.png")] private var ImgBullet:Class;
+		[Embed(source="data/jump.mp3")] private var SndHit:Class;
+		[Embed(source="data/shoot.mp3")] private var SndShoot:Class;
+		
+		public var speed:Number;
 		
 		public function Bullet()
 		{
@@ -23,11 +25,13 @@ package com.adamatomic.Mode
 			addAnimation("left",[2]);
 			addAnimation("right",[3]);
 			addAnimation("poof",[4, 5, 6, 7], 50, false);
+			
+			speed = 360;
 		}
 		
 		override public function update():void
 		{
-			if(dead && finished) exists = false;
+			if(!alive && finished) exists = false;
 			else super.update();
 		}
 
@@ -36,30 +40,41 @@ package com.adamatomic.Mode
 		override public function hitTop(Contact:FlxObject,Velocity:Number):void { kill(); }
 		override public function kill():void
 		{
-			if(dead) return;
+			if(!alive) return;
 			velocity.x = 0;
 			velocity.y = 0;
 			if(onScreen()) FlxG.play(SndHit);
-			dead = true;
+			alive = false;
 			solid = false;
 			play("poof");
 		}
 		
-		public function shoot(X:int, Y:int, VelocityX:int, VelocityY:int):void
+		public function shoot(Location:FlxPoint, Aim:uint):void
 		{
 			FlxG.play(SndShoot);
-			super.reset(X,Y);
+			super.reset(Location.x-width/2,Location.y-height/2);
 			solid = true;
-			velocity.x = VelocityX;
-			velocity.y = VelocityY;
-			if(velocity.y < 0)
-				play("up");
-			else if(velocity.y > 0)
-				play("down");
-			else if(velocity.x < 0)
-				play("left");
-			else if(velocity.x > 0)
-				play("right");
+			switch(Aim)
+			{
+				case FlxSprite.UP:
+					play("up");
+					velocity.y = -speed;
+					break;
+				case FlxSprite.DOWN:
+					play("down");
+					velocity.y = speed;
+					break;
+				case FlxSprite.LEFT:
+					play("left");
+					velocity.x = -speed;
+					break;
+				case FlxSprite.RIGHT:
+					play("right");
+					velocity.x = speed;
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }

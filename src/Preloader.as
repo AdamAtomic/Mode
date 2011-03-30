@@ -7,7 +7,6 @@ package
 		public function Preloader():void
 		{
 			className = "Mode";
-			//myURL = "adamatomic.com/mode";
 			super();
 		}
 	}

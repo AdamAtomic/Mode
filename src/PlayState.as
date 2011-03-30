@@ -1,17 +1,17 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class PlayState extends FlxState
 	{
-		[Embed(source="../../../data/tech_tiles.png")] protected var ImgTech:Class;
-		[Embed(source="../../../data/dirt_top.png")] protected var ImgDirtTop:Class;
-		[Embed(source="../../../data/dirt.png")] protected var ImgDirt:Class;
-		[Embed(source="../../../data/notch.png")] protected var ImgNotch:Class;
-		[Embed(source="../../../data/mode.mp3")] protected var SndMode:Class;
-		[Embed(source="../../../data/countdown.mp3")] protected var SndCount:Class;
-		[Embed(source="../../../data/gibs.png")] private var ImgGibs:Class;
-		[Embed(source="../../../data/spawner_gibs.png")] private var ImgSpawnerGibs:Class;
+		[Embed(source="data/tech_tiles.png")] protected var ImgTech:Class;
+		[Embed(source="data/dirt_top.png")] protected var ImgDirtTop:Class;
+		[Embed(source="data/dirt.png")] protected var ImgDirt:Class;
+		[Embed(source="data/notch.png")] protected var ImgNotch:Class;
+		[Embed(source="data/mode.mp3")] protected var SndMode:Class;
+		[Embed(source="data/countdown.mp3")] protected var SndCount:Class;
+		[Embed(source="data/gibs.png")] private var ImgGibs:Class;
+		[Embed(source="data/spawner_gibs.png")] private var ImgSpawnerGibs:Class;
 		
 		//major game objects
 		protected var _blocks:FlxGroup;
@@ -40,32 +40,27 @@ package com.adamatomic.Mode
 		//just to prevent weirdness during level transition
 		protected var _fading:Boolean;
 		
-		//used to safely reload the playstate after dying
-		public var reload:Boolean;
-		
 		override public function create():void
 		{			
 			FlxG.mouse.hide();
-			reload = false;
 			
 			//get the gibs set up and out of the way
 			_littleGibs = new FlxEmitter();
-			_littleGibs.delay = 3;
 			_littleGibs.setXSpeed(-150,150);
 			_littleGibs.setYSpeed(-200,0);
 			_littleGibs.setRotation(-720,-720);
-			_littleGibs.createSprites(ImgGibs,100,10,true,0.5,0.65);
+			_littleGibs.makeParticles(ImgGibs,100,10,true,0.5,0.5);
 			_bigGibs = new FlxEmitter();
 			_bigGibs.setXSpeed(-200,200);
 			_bigGibs.setYSpeed(-300,0);
 			_bigGibs.setRotation(-720,-720);
-			_bigGibs.createSprites(ImgSpawnerGibs,50,20,true,0.5,0.35);
+			_bigGibs.makeParticles(ImgSpawnerGibs,50,20,true);
 			
 			//level generation needs to know about the spawners (and thusly the bots, players, etc)
 			_blocks = new FlxGroup();
 			_decorations = new FlxGroup();
 			_bullets = new FlxGroup();
-			_player = new Player(316,300,_bullets.members,_littleGibs);
+			_player = new Player(316,300,_bullets,_littleGibs);
 			_bots = new FlxGroup();
 			_botBullets = new FlxGroup();
 			_spawners = new FlxGroup();
@@ -76,23 +71,23 @@ package com.adamatomic.Mode
 			var b:FlxTileblock;
 			
 			b = new FlxTileblock(0,0,640,16);
-			b.loadGraphic(ImgTech);
+			b.loadTiles(ImgTech);
 			_blocks.add(b);
 			
 			b = new FlxTileblock(0,16,16,640-16);
-			b.loadGraphic(ImgTech);
+			b.loadTiles(ImgTech);
 			_blocks.add(b);
 			
 			b = new FlxTileblock(640-16,16,16,640-16);
-			b.loadGraphic(ImgTech);
+			b.loadTiles(ImgTech);
 			_blocks.add(b);
 			
 			b = new FlxTileblock(16,640-24,640-32,8);
-			b.loadGraphic(ImgDirtTop);
+			b.loadTiles(ImgDirtTop);
 			_blocks.add(b);
 			
 			b = new FlxTileblock(16,640-16,640-32,16);
-			b.loadGraphic(ImgDirt);
+			b.loadTiles(ImgDirt);
 			_blocks.add(b);
 			
 			buildRoom(r*0,r*0,true);
@@ -121,12 +116,6 @@ package com.adamatomic.Mode
 			add(_blocks);
 			add(_decorations);
 			add(_bots);
-			
-			//actually create the bullets now
-			for(i = 0; i < 50; i++)
-				_botBullets.add(new BotBullet());
-			for(i = 0; i < 8; i++)
-				_bullets.add(new Bullet());
 
 			//add player and set up scrolling camera
 			add(_player);
@@ -198,7 +187,7 @@ package com.adamatomic.Mode
 			}
 			
 			//HUD - the "gun jammed" notification
-			_jamBar = this.add((new FlxSprite(0,FlxG.height-22)).createGraphic(FlxG.width,24,0xff131c1b)) as FlxSprite;
+			_jamBar = this.add((new FlxSprite(0,FlxG.height-22)).makeGraphic(FlxG.width,24,0xff131c1b)) as FlxSprite;
 			_jamBar.scrollFactor.x = _jamBar.scrollFactor.y = 0;
 			_jamBar.visible = false;
 			_jamText = new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED");
@@ -250,7 +239,7 @@ package com.adamatomic.Mode
 				_scoreTimer -= FlxG.elapsed;
 				if(_scoreTimer < 0)
 				{
-					if(FlxG.score > 0) 
+					if(FlxG.score > 0)
 					{
 						FlxG.play(SndCount);
 						if(FlxG.score > 100) FlxG.score -= 100;
@@ -292,29 +281,26 @@ package com.adamatomic.Mode
 			//actually update score text if it changed
 			if(os != FlxG.score)
 			{
-				if(_player.dead) FlxG.score = 0;
+				if(!_player.alive) FlxG.score = 0;
 				_score.text = FlxG.score.toString();
 			}
-			
-			if(reload)
-				FlxG.state = new PlayState();
 			
 			//Toggle the bounding box visibility
 			if(FlxG.keys.justPressed("B"))
 				FlxG.showBounds = !FlxG.showBounds;
 		}
 
-		protected function overlapped(Object1:FlxObject,Object2:FlxObject):void
+		protected function overlapped(Sprite1:FlxSprite,Sprite2:FlxSprite):void
 		{
-			if((Object1 is BotBullet) || (Object1 is Bullet))
-				Object1.kill();
-			Object2.hurt(1);
+			if((Sprite1 is BotBullet) || (Sprite1 is Bullet))
+				Sprite1.kill();
+			Sprite2.hurt(1);
 		}
 		
 		protected function onVictory():void
 		{
 			FlxG.music.stop();
-			FlxG.state = new VictoryState();
+			FlxG.switchState(new VictoryState());
 		}
 		
 		//Just plops down a spawner and some blocks - haphazard and crappy atm but functional!
@@ -379,7 +365,7 @@ package com.adamatomic.Mode
 			
 			//Finally actually add the spawner
 			if(Spawners)
-				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_bots,_botBullets.members,_littleGibs,_player));
+				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_bots,_botBullets,_littleGibs,_player));
 		}
 	}
 }

@@ -1,27 +1,25 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class Player extends FlxSprite
 	{
-		[Embed(source="../../../data/spaceman.png")] private var ImgSpaceman:Class;
-		[Embed(source="../../../data/jump.mp3")] private var SndJump:Class;
-		[Embed(source="../../../data/land.mp3")] private var SndLand:Class;
-		[Embed(source="../../../data/asplode.mp3")] private var SndExplode:Class;
-		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndExplode2:Class;
-		[Embed(source="../../../data/hurt.mp3")] private var SndHurt:Class;
-		[Embed(source="../../../data/jam.mp3")] private var SndJam:Class;
+		[Embed(source="data/spaceman.png")] private var ImgSpaceman:Class;
+		
+		[Embed(source="data/jump.mp3")] private var SndJump:Class;
+		[Embed(source="data/land.mp3")] private var SndLand:Class;
+		[Embed(source="data/asplode.mp3")] private var SndExplode:Class;
+		[Embed(source="data/menu_hit_2.mp3")] private var SndExplode2:Class;
+		[Embed(source="data/hurt.mp3")] private var SndHurt:Class;
+		[Embed(source="data/jam.mp3")] private var SndJam:Class;
 		
 		private var _jumpPower:int;
-		private var _bullets:Array;
-		private var _curBullet:uint;
-		private var _bulletVel:int;
-		private var _up:Boolean;
-		private var _down:Boolean;
+		private var _bullets:FlxGroup;
+		private var _aim:uint;
 		private var _restart:Number;
 		private var _gibs:FlxEmitter;
 		
-		public function Player(X:int,Y:int,Bullets:Array,Gibs:FlxEmitter)
+		public function Player(X:int,Y:int,Bullets:FlxGroup,Gibs:FlxEmitter)
 		{
 			super(X,Y);
 			loadGraphic(ImgSpaceman,true,true,8);
@@ -52,8 +50,6 @@ package com.adamatomic.Mode
 			
 			//bullet stuff
 			_bullets = Bullets;
-			_curBullet = 0;
-			_bulletVel = 360;
 			
 			//Gibs emitted upon death
 			_gibs = Gibs;
@@ -62,11 +58,11 @@ package com.adamatomic.Mode
 		override public function update():void
 		{
 			//game restart timer
-			if(dead)
+			if(!alive)
 			{
 				_restart += FlxG.elapsed;
 				if(_restart > 2)
-					(FlxG.state as PlayState).reload = true;
+					FlxG.resetState();
 				return;
 			}
 			
@@ -89,60 +85,38 @@ package com.adamatomic.Mode
 			}
 			
 			//AIMING
-			_up = false;
-			_down = false;
-			if(FlxG.keys.UP) _up = true;
-			else if(FlxG.keys.DOWN && velocity.y) _down = true;
+			if(FlxG.keys.UP)
+				_aim = UP;
+			else if(FlxG.keys.DOWN && velocity.y)
+				_aim = DOWN;
+			else
+				_aim = facing;
 			
 			//ANIMATION
 			if(velocity.y != 0)
 			{
-				if(_up) play("jump_up");
-				else if(_down) play("jump_down");
+				if(_aim == UP) play("jump_up");
+				else if(_aim == DOWN) play("jump_down");
 				else play("jump");
 			}
 			else if(velocity.x == 0)
 			{
-				if(_up) play("idle_up");
+				if(_aim == UP) play("idle_up");
 				else play("idle");
 			}
 			else
 			{
-				if(_up) play("run_up");
+				if(_aim == UP) play("run_up");
 				else play("run");
 			}
 			
 			//SHOOTING
 			if(!flickering() && FlxG.keys.justPressed("C"))
 			{
-				var bXVel:int = 0;
-				var bYVel:int = 0;
-				var bX:int = x;
-				var bY:int = y;
-				if(_up)
-				{
-					bY -= _bullets[_curBullet].height - 4;
-					bYVel = -_bulletVel;
-				}
-				else if(_down)
-				{
-					bY += height - 4;
-					bYVel = _bulletVel;
+				getMidpoint(_point);
+				(_bullets.recycle(Bullet) as Bullet).shoot(_point,_aim);
+				if(_aim == DOWN)
 					velocity.y -= 36;
-				}
-				else if(facing == RIGHT)
-				{
-					bX += width - 4;
-					bXVel = _bulletVel;
-				}
-				else
-				{
-					bX -= _bullets[_curBullet].width - 4;
-					bXVel = -_bulletVel;
-				}
-				_bullets[_curBullet].shoot(bX,bY,bXVel,bYVel);
-				if(++_curBullet >= _bullets.length)
-					_curBullet = 0;
 			}
 				
 			//UPDATE POSITION AND ANIMATION
@@ -181,7 +155,7 @@ package com.adamatomic.Mode
 		
 		override public function kill():void
 		{
-			if(dead)
+			if(!alive)
 				return;
 			solid = false;
 			FlxG.play(SndExplode);
@@ -195,7 +169,7 @@ package com.adamatomic.Mode
 			if(_gibs != null)
 			{
 				_gibs.at(this);
-				_gibs.start(true,0,50);
+				_gibs.start(true,5,0,50);
 			}
 		}
 	}

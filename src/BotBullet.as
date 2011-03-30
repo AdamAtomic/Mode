@@ -1,12 +1,12 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class BotBullet extends FlxSprite
 	{
-		[Embed(source="../../../data/bot_bullet.png")] private var ImgBullet:Class;
-		[Embed(source="../../../data/jump.mp3")] private var SndHit:Class;
-		[Embed(source="../../../data/enemy.mp3")] private var SndShoot:Class;
+		[Embed(source="data/bot_bullet.png")] private var ImgBullet:Class;
+		[Embed(source="data/jump.mp3")] private var SndHit:Class;
+		[Embed(source="data/enemy.mp3")] private var SndShoot:Class;
 		
 		public function BotBullet()
 		{
@@ -19,7 +19,7 @@ package com.adamatomic.Mode
 		
 		override public function update():void
 		{
-			if(dead && finished) exists = false;
+			if(!alive && finished) exists = false;
 			else super.update();
 		}
 
@@ -28,11 +28,11 @@ package com.adamatomic.Mode
 		override public function hitTop(Contact:FlxObject,Velocity:Number):void { kill(); }
 		override public function kill():void
 		{
-			if(dead) return;
+			if(!alive) return;
 			velocity.x = 0;
 			velocity.y = 0;
 			if(onScreen()) FlxG.play(SndHit);
-			dead = true;
+			alive = false;
 			solid = false;
 			play("poof");
 		}

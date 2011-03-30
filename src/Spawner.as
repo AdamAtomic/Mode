@@ -1,23 +1,23 @@
-package com.adamatomic.Mode
+package
 {
 	import org.flixel.*;
 
 	public class Spawner extends FlxSprite
 	{
-		[Embed(source="../../../data/spawner.png")] private var ImgSpawner:Class;
-		[Embed(source="../../../data/asplode.mp3")] private var SndExplode:Class;
-		[Embed(source="../../../data/menu_hit_2.mp3")] private var SndExplode2:Class;
-		[Embed(source="../../../data/hit.mp3")] private var SndHit:Class;
+		[Embed(source="data/spawner.png")] private var ImgSpawner:Class;
+		[Embed(source="data/asplode.mp3")] private var SndExplode:Class;
+		[Embed(source="data/menu_hit_2.mp3")] private var SndExplode2:Class;
+		[Embed(source="data/hit.mp3")] private var SndHit:Class;
 		
 		private var _timer:Number;
 		private var _bots:FlxGroup;
-		private var _botBullets:Array;
+		private var _botBullets:FlxGroup;
 		private var _botGibs:FlxEmitter;
 		private var _gibs:FlxEmitter;
 		private var _player:Player;
 		private var _open:Boolean;
 		
-		public function Spawner(X:int, Y:int,Gibs:FlxEmitter,Bots:FlxGroup,BotBullets:Array,BotGibs:FlxEmitter,ThePlayer:Player)
+		public function Spawner(X:int, Y:int,Gibs:FlxEmitter,Bots:FlxGroup,BotBullets:FlxGroup,BotGibs:FlxEmitter,ThePlayer:Player)
 		{
 			super(X,Y);
 			loadGraphic(ImgSpawner,true);
@@ -76,7 +76,7 @@ package com.adamatomic.Mode
 		
 		override public function kill():void
 		{
-			if(dead)
+			if(!alive)
 				return;
 			FlxG.play(SndExplode);
 			FlxG.play(SndExplode2);
@@ -90,21 +90,13 @@ package com.adamatomic.Mode
 			FlxG.flash.start(0xffd8eba2,0.35);
 			makeBot();
 			_gibs.at(this);
-			_gibs.start(true,3,0);
+			_gibs.start(true,3);
 			FlxG.score += 1000;
 		}
 		
 		protected function makeBot():void
 		{
-			//Try to recycle a dead bot
-			if(_bots.resetFirstAvail(x + width/2 - 6, y + height/2 - 6))
-				return;
-			
-			//If there weren't any non-existent ones to respawn, just add a new one instead
-			var bot:Bot = new Bot(x + width/2, y + height/2, _botBullets, _botGibs, _player);
-			bot.x -= bot.width/2;
-			bot.y -= bot.height/2;
-			_bots.add(bot);
+			(_bots.recycle(Enemy) as Enemy).init(x + width/2, y + height/2, _botBullets, _botGibs, _player);
 		}
 	}
 }
