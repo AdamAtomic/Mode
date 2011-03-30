@@ -13,22 +13,23 @@ package
 		[Embed(source="data/gibs.png")] private var ImgGibs:Class;
 		[Embed(source="data/spawner_gibs.png")] private var ImgSpawnerGibs:Class;
 		
-		//major game objects
+		//major game object storage
 		protected var _blocks:FlxGroup;
 		protected var _decorations:FlxGroup;
 		protected var _bullets:FlxGroup;
 		protected var _player:Player;
-		protected var _bots:FlxGroup;
+		protected var _enemies:FlxGroup;
 		protected var _spawners:FlxGroup;
-		protected var _botBullets:FlxGroup;
+		protected var _enemyBullets:FlxGroup;
 		protected var _littleGibs:FlxEmitter;
 		protected var _bigGibs:FlxEmitter;
+		protected var _hud:FlxGroup;
 		
 		//meta groups, to help speed up collisions
 		protected var _objects:FlxGroup;
-		protected var _enemies:FlxGroup;
+		protected var _hazards:FlxGroup;
 		
-		//HUD
+		//HUD/User Interface stuff
 		protected var _score:FlxText;
 		protected var _score2:FlxText;
 		protected var _scoreTimer:Number;
@@ -44,68 +45,37 @@ package
 		{			
 			FlxG.mouse.hide();
 			
-			//get the gibs set up and out of the way
+			//Here we are creating a pool of 100 little metal bits that can be exploded.
+			//We will recycle the crap out of these!
 			_littleGibs = new FlxEmitter();
 			_littleGibs.setXSpeed(-150,150);
 			_littleGibs.setYSpeed(-200,0);
 			_littleGibs.setRotation(-720,-720);
 			_littleGibs.makeParticles(ImgGibs,100,10,true,0.5,0.5);
+			
+			//Next we create a smaller pool of larger metal bits for exploding.
 			_bigGibs = new FlxEmitter();
 			_bigGibs.setXSpeed(-200,200);
 			_bigGibs.setYSpeed(-300,0);
 			_bigGibs.setRotation(-720,-720);
 			_bigGibs.makeParticles(ImgSpawnerGibs,50,20,true);
 			
-			//level generation needs to know about the spawners (and thusly the bots, players, etc)
+			//Then we'll set up the rest of our object groups or pools
 			_blocks = new FlxGroup();
 			_decorations = new FlxGroup();
-			_bullets = new FlxGroup();
-			_player = new Player(316,300,_bullets,_littleGibs);
-			_bots = new FlxGroup();
-			_botBullets = new FlxGroup();
+			_enemies = new FlxGroup();
 			_spawners = new FlxGroup();
+			_hud = new FlxGroup();
+			_enemyBullets = new FlxGroup();
+			_bullets = new FlxGroup();
 			
-			//simple procedural level generation
-			var i:uint;
-			var r:uint = 160;
-			var b:FlxTileblock;
-			
-			b = new FlxTileblock(0,0,640,16);
-			b.loadTiles(ImgTech);
-			_blocks.add(b);
-			
-			b = new FlxTileblock(0,16,16,640-16);
-			b.loadTiles(ImgTech);
-			_blocks.add(b);
-			
-			b = new FlxTileblock(640-16,16,16,640-16);
-			b.loadTiles(ImgTech);
-			_blocks.add(b);
-			
-			b = new FlxTileblock(16,640-24,640-32,8);
-			b.loadTiles(ImgDirtTop);
-			_blocks.add(b);
-			
-			b = new FlxTileblock(16,640-16,640-32,16);
-			b.loadTiles(ImgDirt);
-			_blocks.add(b);
-			
-			buildRoom(r*0,r*0,true);
-			buildRoom(r*1,r*0);
-			buildRoom(r*2,r*0);
-			buildRoom(r*3,r*0,true);
-			buildRoom(r*0,r*1,true);
-			buildRoom(r*1,r*1);
-			buildRoom(r*2,r*1);
-			buildRoom(r*3,r*1,true);
-			buildRoom(r*0,r*2);
-			buildRoom(r*1,r*2);
-			buildRoom(r*2,r*2);
-			buildRoom(r*3,r*2);
-			buildRoom(r*0,r*3,true);
-			buildRoom(r*1,r*3);
-			buildRoom(r*2,r*3);
-			buildRoom(r*3,r*3,true);
+			//Now that we have references to the bullets and metal bits,
+			//we can create the player object.
+			_player = new Player(316,300,_bullets,_littleGibs);
+
+			//This refers to a custom function down at the bottom of the file
+			//that creates all our level geometry.
+			generateLevel();
 			
 			//Add bots and spawners after we add blocks to the state,
 			// so that they're drawn on top of the level, and so that
@@ -115,54 +85,50 @@ package
 			add(_bigGibs);
 			add(_blocks);
 			add(_decorations);
-			add(_bots);
+			add(_enemies);
 
-			//add player and set up scrolling camera
+			//Then we add the player and set up the scrolling camera
 			add(_player);
 			FlxG.follow(_player,2.5);
 			FlxG.followAdjust(0.5,0.0);
 			FlxG.followBounds(0,0,640,640);
 			
-			//add gibs + bullets to scene here, so they're drawn on top of pretty much everything
-			add(_botBullets);
+			//We add the bullets to the scene here,
+			//so they're drawn on top of pretty much everything
+			add(_enemyBullets);
 			add(_bullets);
+			add(_hud);
 			
-			//finally we are going to sort things into a couple of helper groups.
-			//we don't add these to the state, we just use them for collisions later!
-			_enemies = new FlxGroup();
-			_enemies.add(_botBullets);
-			_enemies.add(_spawners);
-			_enemies.add(_bots);
+			//Finally we are going to sort things into a couple of helper groups.
+			//We don't add these groups to the state, we just use them for collisions later!
+			_hazards = new FlxGroup();
+			_hazards.add(_enemyBullets);
+			_hazards.add(_spawners);
+			_hazards.add(_enemies);
 			_objects = new FlxGroup();
-			_objects.add(_botBullets);
+			_objects.add(_enemyBullets);
 			_objects.add(_bullets);
-			_objects.add(_bots);
+			_objects.add(_enemies);
 			_objects.add(_player);
 			_objects.add(_littleGibs);
 			_objects.add(_bigGibs);
 			
-			//HUD - score
-			var ssf:FlxPoint = new FlxPoint(0,0);
+			//From here on out we are making objects for the HUD,
+			//that is, the player score, number of spawners left, etc.
+			//First, we'll create a text field for the current score
 			_score = new FlxText(0,0,FlxG.width);
-			_score.color = 0xd8eba2;
-			_score.size = 16;
-			_score.alignment = "center";
-			_score.scrollFactor = ssf;
-			_score.shadow = 0x131c1b;
-			add(_score);
+			_score.setFormat(null,16,0xd8eba2,"center",0x131c1b);
+			_hud.add(_score);
 			if(FlxG.scores.length < 2)
 			{
 				FlxG.scores.push(0);
 				FlxG.scores.push(0);
 			}
 			
-			//HUD - highest and last scores
-			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2)
-			_score2.color = 0xd8eba2;
-			_score2.alignment = "right";
-			_score2.scrollFactor = ssf;
-			_score2.shadow = _score.shadow;
-			add(_score2);
+			//Then for the player's highest and last scores
+			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2);
+			_score2.setFormat(null,8,0xd8eba2,"right",_score.shadow);
+			_hud.add(_score2);
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
 			if(FlxG.scores[0] != 0)
@@ -170,37 +136,68 @@ package
 			FlxG.score = 0;
 			_scoreTimer = 0;
 			
-			//HUD - the "number of spawns left" icons
+			//Create an Array of sprites with 1 icon for each spawner, like a checklist.
 			_notches = new Array();
 			var tmp:FlxSprite;
-			for(i = 0; i < 6; i++)
+			for(var i:uint = 0; i < 6; i++)
 			{
 				tmp = new FlxSprite(4+i*10,4);
 				tmp.loadGraphic(ImgNotch,true);
-				tmp.scrollFactor.x = tmp.scrollFactor.y = 0;
 				tmp.addAnimation("on",[0]);
 				tmp.addAnimation("off",[1]);
 				tmp.moves = false;
 				tmp.solid = false;
 				tmp.play("on");
-				_notches.push(this.add(tmp));
+				_notches.push(tmp);
+				_hud.add(tmp);
 			}
 			
-			//HUD - the "gun jammed" notification
-			_jamBar = this.add((new FlxSprite(0,FlxG.height-22)).makeGraphic(FlxG.width,24,0xff131c1b)) as FlxSprite;
-			_jamBar.scrollFactor.x = _jamBar.scrollFactor.y = 0;
+			//Then we create the "gun jammed" notification
+			_jamBar = new FlxSprite(0,FlxG.height-22).makeGraphic(FlxG.width,24,0xff131c1b);
 			_jamBar.visible = false;
+			_hud.add(_jamBar);
 			_jamText = new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED");
-			_jamText.color = 0xd8eba2;
-			_jamText.size = 16;
-			_jamText.alignment = "center";
-			_jamText.scrollFactor = ssf;
+			_jamText.setFormat(null,16,0xd8eba2,"center");
 			_jamText.visible = false;
-			add(_jamText);
+			_hud.add(_jamText);
+			
+			//After we add all the objects to the HUD, we can go through
+			//and set any property we want on all the objects we added
+			//with this sweet function.  In this case, we want to set
+			//the scroll factors to zero, to make sure the HUD doesn't
+			//wiggle around while we play.
+			_hud.setAll("scrollFactor",new FlxPoint(0,0));
 			
 			FlxG.playMusic(SndMode);
 			FlxG.flash.start(0xff131c1b);
 			_fading = false;
+		}
+		
+		override public function destroy():void
+		{
+			super.destroy();
+			
+			_blocks = null;
+			_decorations = null;
+			_bullets = null;
+			_player = null;
+			_enemies = null;
+			_spawners = null;
+			_enemyBullets = null;
+			_littleGibs = null;
+			_bigGibs = null;
+			_hud = null;
+			
+			//meta groups, to help speed up collisions
+			_objects = null;
+			_hazards = null;
+			
+			//HUD/User Interface stuff
+			_score = null;
+			_score2 = null;
+			_jamBar = null;
+			_jamText = null;
+			_notches = null;
 		}
 
 		override public function update():void
@@ -211,8 +208,8 @@ package
 			
 			//collisions with environment
 			FlxU.collide(_blocks,_objects);
-			FlxU.overlap(_enemies,_player,overlapped);
-			FlxU.overlap(_bullets,_enemies,overlapped);
+			FlxU.overlap(_hazards,_player,overlapped);
+			FlxU.overlap(_bullets,_hazards,overlapped);
 			
 			//Jammed message
 			if(FlxG.keys.justPressed("C") && _player.flickering())
@@ -267,8 +264,7 @@ package
 				}
 				else
 				{
-					var l:uint = _notches.length;
-					for(var i:uint = 0; i < l; i++)
+					for(var i:uint = 0; i < _notches.length; i++)
 					{
 						if(i < spawnerCount)
 							_notches[i].play("on");
@@ -284,23 +280,70 @@ package
 				if(!_player.alive) FlxG.score = 0;
 				_score.text = FlxG.score.toString();
 			}
-			
-			//Toggle the bounding box visibility
-			if(FlxG.keys.justPressed("B"))
-				FlxG.showBounds = !FlxG.showBounds;
 		}
 
+		//This is an overlap callback function, triggered by the calls to FlxU.overlap().
 		protected function overlapped(Sprite1:FlxSprite,Sprite2:FlxSprite):void
 		{
-			if((Sprite1 is BotBullet) || (Sprite1 is Bullet))
+			if((Sprite1 is EnemyBullet) || (Sprite1 is Bullet))
 				Sprite1.kill();
 			Sprite2.hurt(1);
 		}
 		
+		//A FlxG.fade callback, like in MenuState.
 		protected function onVictory():void
 		{
 			FlxG.music.stop();
 			FlxG.switchState(new VictoryState());
+		}
+		
+		//These next two functions look crazy, but all they're doing is generating
+		//the level structure and placing the enemy spawners.
+		protected function generateLevel():void
+		{
+			var r:uint = 160;
+			var b:FlxTileblock;
+		
+			//First, we create the walls, ceiling and floors:
+			b = new FlxTileblock(0,0,640,16);
+			b.loadTiles(ImgTech);
+			_blocks.add(b);
+			
+			b = new FlxTileblock(0,16,16,640-16);
+			b.loadTiles(ImgTech);
+			_blocks.add(b);
+			
+			b = new FlxTileblock(640-16,16,16,640-16);
+			b.loadTiles(ImgTech);
+			_blocks.add(b);
+			
+			b = new FlxTileblock(16,640-24,640-32,8);
+			b.loadTiles(ImgDirtTop);
+			_blocks.add(b);
+			
+			b = new FlxTileblock(16,640-16,640-32,16);
+			b.loadTiles(ImgDirt);
+			_blocks.add(b);
+			
+			//Then we split the game world up into a 4x4 grid,
+			//and generate some blocks in each area.  Some grid spaces
+			//also get a spawner!
+			buildRoom(r*0,r*0,true);
+			buildRoom(r*1,r*0);
+			buildRoom(r*2,r*0);
+			buildRoom(r*3,r*0,true);
+			buildRoom(r*0,r*1,true);
+			buildRoom(r*1,r*1);
+			buildRoom(r*2,r*1);
+			buildRoom(r*3,r*1,true);
+			buildRoom(r*0,r*2);
+			buildRoom(r*1,r*2);
+			buildRoom(r*2,r*2);
+			buildRoom(r*3,r*2);
+			buildRoom(r*0,r*3,true);
+			buildRoom(r*1,r*3);
+			buildRoom(r*2,r*3);
+			buildRoom(r*3,r*3,true);
 		}
 		
 		//Just plops down a spawner and some blocks - haphazard and crappy atm but functional!
@@ -330,7 +373,6 @@ package
 			var check:Boolean;
 			for(var i:uint = 0; i < numBlocks; i++)
 			{
-				check = false;
 				do
 				{
 					//keep generating different specs if they overlap the spawner
@@ -345,7 +387,6 @@ package
 				} while(!check);
 				
 				var b:FlxTileblock;
-				
 				b = new FlxTileblock(RX+bx*8,RY+by*8,bw*8,bh*8);
 				b.loadTiles(ImgTech);
 				_blocks.add(b);
@@ -365,7 +406,7 @@ package
 			
 			//Finally actually add the spawner
 			if(Spawners)
-				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_bots,_botBullets,_littleGibs,_player));
+				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_enemies,_enemyBullets,_littleGibs,_player));
 		}
 	}
 }

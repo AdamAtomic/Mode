@@ -27,7 +27,9 @@ package
 			add(gibs);
 			gibs.start(false,0,0.005);
 			
-			add((new FlxText(0,FlxG.height/2-35,FlxG.width,"VICTORY\n\nSCORE: "+FlxG.score)).setFormat(null,16,0xd8eba2,"center"));
+			var text:FlxText = new FlxText(0,FlxG.height/2-35,FlxG.width,"VICTORY\n\nSCORE: "+FlxG.score);
+			text.setFormat(null,16,0xd8eba2,"center");
+			add(text);
 		}
 
 		override public function update():void

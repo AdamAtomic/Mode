@@ -4,21 +4,24 @@ package
 
 	public class Player extends FlxSprite
 	{
-		[Embed(source="data/spaceman.png")] private var ImgSpaceman:Class;
+		[Embed(source="data/spaceman.png")] protected var ImgSpaceman:Class;
 		
-		[Embed(source="data/jump.mp3")] private var SndJump:Class;
-		[Embed(source="data/land.mp3")] private var SndLand:Class;
-		[Embed(source="data/asplode.mp3")] private var SndExplode:Class;
-		[Embed(source="data/menu_hit_2.mp3")] private var SndExplode2:Class;
-		[Embed(source="data/hurt.mp3")] private var SndHurt:Class;
-		[Embed(source="data/jam.mp3")] private var SndJam:Class;
+		[Embed(source="data/jump.mp3")] protected var SndJump:Class;
+		[Embed(source="data/land.mp3")] protected var SndLand:Class;
+		[Embed(source="data/asplode.mp3")] protected var SndExplode:Class;
+		[Embed(source="data/menu_hit_2.mp3")] protected var SndExplode2:Class;
+		[Embed(source="data/hurt.mp3")] protected var SndHurt:Class;
+		[Embed(source="data/jam.mp3")] protected var SndJam:Class;
 		
-		private var _jumpPower:int;
-		private var _bullets:FlxGroup;
-		private var _aim:uint;
-		private var _restart:Number;
-		private var _gibs:FlxEmitter;
+		protected var _jumpPower:int;
+		protected var _bullets:FlxGroup;
+		protected var _aim:uint;
+		protected var _restart:Number;
+		protected var _gibs:FlxEmitter;
 		
+		//This is the player object class.  Most of the comments I would put in here
+		//would be near duplicates of the Enemy class, so if you're confused at all
+		//I'd recommend checking that out for some ideas!
 		public function Player(X:int,Y:int,Bullets:FlxGroup,Gibs:FlxEmitter)
 		{
 			super(X,Y);
@@ -50,9 +53,14 @@ package
 			
 			//bullet stuff
 			_bullets = Bullets;
-			
-			//Gibs emitted upon death
 			_gibs = Gibs;
+		}
+		
+		override public function destroy():void
+		{
+			super.destroy();
+			_bullets = null;
+			_gibs = null;
 		}
 		
 		override public function update():void

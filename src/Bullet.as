@@ -18,7 +18,6 @@ package
 			height = 6;
 			offset.x = 1;
 			offset.y = 1;
-			exists = false;
 			
 			addAnimation("up",[0]);
 			addAnimation("down",[1]);

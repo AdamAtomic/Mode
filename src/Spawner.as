@@ -35,6 +35,16 @@ package
 			addAnimation("dead", [6]);
 		}
 		
+		override public function destroy():void
+		{
+			super.destroy();
+			_bots = null;
+			_botGibs = null;
+			_botBullets = null;
+			_gibs = null;
+			_player = null;
+		}
+		
 		override public function update():void
 		{
 			_timer += FlxG.elapsed;
