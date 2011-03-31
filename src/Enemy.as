@@ -61,7 +61,7 @@ package
 			//speed and direction during the update() loop.
 			maxAngular = 120;
 			angularDrag = 400;
-			drag.x = 30;
+			drag.x = 35;
 			_thrust = 0;
 			_playerMidpoint = new FlxPoint();
 		}

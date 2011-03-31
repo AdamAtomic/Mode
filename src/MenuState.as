@@ -29,8 +29,8 @@ package
 			//the default settings are 60/30, but Mode has a lot of collisions and fast action,
 			//so we are turning down the engine framerate a bit,
 			//and turning up the flash player framerate a bit.
-			FlxG.framerate = 40;
-			FlxG.flashFramerate = 40;
+			FlxG.framerate = 50;
+			FlxG.flashFramerate = 50;
 			
 			//Simple use of flixel save game object.
 			//Tracks number of times the game has been played.

@@ -171,6 +171,9 @@ package
 			FlxG.playMusic(SndMode);
 			FlxG.flash.start(0xff131c1b);
 			_fading = false;
+			
+			FlxG.watch(_enemies,"length","enemies used");
+			FlxG.watch(_enemies.members,"length","enemies capacity");
 		}
 		
 		override public function destroy():void
