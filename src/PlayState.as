@@ -7,7 +7,6 @@ package
 		[Embed(source="data/tech_tiles.png")] protected var ImgTech:Class;
 		[Embed(source="data/dirt_top.png")] protected var ImgDirtTop:Class;
 		[Embed(source="data/dirt.png")] protected var ImgDirt:Class;
-		[Embed(source="data/notch.png")] protected var ImgNotch:Class;
 		[Embed(source="data/mode.mp3")] protected var SndMode:Class;
 		[Embed(source="data/countdown.mp3")] protected var SndCount:Class;
 		[Embed(source="data/gibs.png")] private var ImgGibs:Class;
