@@ -10,7 +10,6 @@ package
 		public function Mode():void
 		{
 			super(320,240,MenuState);
-			FlxG.bgColor = 0xff131c1b;
 			debugOnRelease = true;
 		}
 	}

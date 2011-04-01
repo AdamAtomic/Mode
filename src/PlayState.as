@@ -152,7 +152,7 @@ package
 			_hud.setAll("cameras",[FlxG.camera]);
 			
 			FlxG.playMusic(SndMode);
-			FlxG.flash.start(0xff131c1b);
+			FlxG.flash(0xff131c1b);
 			_fading = false;
 			
 			//Debugger Watch examples
@@ -248,7 +248,7 @@ package
 				if(_spawners.countLiving() <= 0)
 				{
 					_fading = true;
-					FlxG.fade.start(0xffd8eba2,3,onVictory);
+					FlxG.fade(0xffd8eba2,3,onVictory);
 				}
 			}
 			

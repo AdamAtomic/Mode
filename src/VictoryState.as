@@ -14,7 +14,7 @@ package
 		{
 			_timer = 0;
 			_fading = false;
-			FlxG.flash.start(0xffd8eba2);
+			FlxG.flash(0xffd8eba2);
 			
 			//Gibs emitted upon death
 			var gibs:FlxEmitter = new FlxEmitter(0,-50);
@@ -42,7 +42,7 @@ package
 				{
 					_fading = true;
 					FlxG.play(SndMenu);
-					FlxG.fade.start(0xff131c1b,2,onPlay);
+					FlxG.fade(0xff131c1b,2,onPlay);
 				}
 			}
 		}

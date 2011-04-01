@@ -96,8 +96,9 @@ package
 			solid = false;
 			flicker(0);
 			play("dead");
-			FlxG.quake.start(0.005,0.35);
-			FlxG.flash.start(0xffd8eba2,0.35);
+			FlxG.camera.shake(0.007,0.25);
+			FlxG.camera.flash(0xffd8eba2,0.65,turnOffSlowMo);
+			FlxG.timeScale = 0.35;
 			makeBot();
 			_gibs.at(this);
 			_gibs.start(true,3);
@@ -107,6 +108,11 @@ package
 		protected function makeBot():void
 		{
 			(_bots.recycle(Enemy) as Enemy).init(x + width/2, y + height/2, _botBullets, _botGibs, _player);
+		}
+		
+		protected function turnOffSlowMo():void
+		{
+			FlxG.timeScale = 1.0;
 		}
 	}
 }

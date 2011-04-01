@@ -172,8 +172,8 @@ package
 			flicker(0);
 			exists = true;
 			visible = false;
-			FlxG.quake.start(0.005,0.35);
-			FlxG.flash.start(0xffd8eba2,0.35);
+			FlxG.camera.shake(0.005,0.35);
+			FlxG.camera.flash(0xffd8eba2,0.35);
 			if(_gibs != null)
 			{
 				_gibs.at(this);

@@ -31,6 +31,7 @@ package
 			//and turning up the flash player framerate a bit.
 			FlxG.framerate = 50;
 			FlxG.flashFramerate = 50;
+			FlxG.bgColor = 0xff131c1b;
 			
 			//Simple use of flixel save game object.
 			//Tracks number of times the game has been played.
@@ -52,7 +53,7 @@ package
 			gibs.setYSpeed(-200,-20);
 			gibs.setRotation(-720,720);
 			gibs.gravity = 100;
-			gibs.makeParticles(ImgGibs,1000,32,true,0,0);
+			gibs.makeParticles(ImgGibs,650,32,true,0,0);
 			add(gibs);
 
 			//the letters "mo"
@@ -100,8 +101,8 @@ package
 				
 				//Then, play a cool sound, change their color, and blow up pieces everywhere
 				FlxG.play(SndHit);
-				FlxG.flash.start(0xffd8eba2,0.5);
-				FlxG.quake.start(0.035,0.5);
+				FlxG.flash(0xffd8eba2,0.5);
+				FlxG.shake(0.035,0.5);
 				title1.color = 0xd8eba2;
 				title2.color = 0xd8eba2;
 				gibs.start(true,5);
@@ -135,7 +136,7 @@ package
 				playButton = new FlxButton(flixelButton.x,flixelButton.y + 82,onPlay,"CLICK HERE");
 				playButton.color = flixelButton.color;
 				playButton.label.color = flixelButton.label.color;
-				//add(playButton); //TEMPORARY DEBUG BEHAVIOR
+				add(playButton);
 			}
 
 			//X + C were pressed, fade out and change to play state.
@@ -145,11 +146,10 @@ package
 				attractMode = true;
 			if(!fading && ((FlxG.keys.X && FlxG.keys.C) || attractMode)) 
 			{
-				onFade();	//TEMPORARY DEBUG BEHAVIOR
 				fading = true;
 				FlxG.play(SndHit2);
-				FlxG.flash.start(0xffd8eba2,0.5);
-				FlxG.fade.start(0xff131c1b,1,onFade);
+				FlxG.flash(0xffd8eba2,0.5);
+				FlxG.fade(0xff131c1b,1,onFade);
 			}
 		}
 		
@@ -178,7 +178,7 @@ package
 		protected function onFade():void
 		{
 			if(attractMode)
-				FlxG.loadReplay((FlxG.random()<0.5)?(new Attract1()):(new Attract2()),new PlayState(),["ANY"],15,onDemoComplete);
+				FlxG.loadReplay((FlxG.random()<0.5)?(new Attract1()):(new Attract2()),new PlayState(),["ANY"],22,onDemoComplete);
 			else
 				FlxG.switchState(new PlayState());
 		}
@@ -187,7 +187,7 @@ package
 		//Here, we initiate another fade effect.
 		protected function onDemoComplete():void
 		{
-			FlxG.fade.start(0xff131c1b,1,onDemoFaded);
+			FlxG.fade(0xff131c1b,1,onDemoFaded);
 		}
 		
 		//Finally, we have another function called by FlxG.fade(), this time
