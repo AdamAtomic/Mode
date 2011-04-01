@@ -76,7 +76,7 @@ package
 			timer = 0;
 			attractMode = false;
 			
-			FlxG.mouse.show(ImgCursor);
+			FlxG.mouse.show(ImgCursor,2);
 		}
 		
 		override public function destroy():void

@@ -41,7 +41,7 @@ package
 		
 		override public function create():void
 		{
-			FlxG.mouse.hide();
+			//FlxG.mouse.hide();
 			
 			//Here we are creating a pool of 100 little metal bits that can be exploded.
 			//We will recycle the crap out of these!
@@ -91,7 +91,7 @@ package
 			//which will automatically set the boundaries of the world.
 			add(_player);
 			FlxG.camera.setBounds(0,0,640,640,true);
-			FlxG.camera.follow(_player,2.5,0.5,0);
+			FlxG.camera.follow(_player,FlxCamera.STYLE_PLATFORMER);
 			
 			//We add the bullets to the scene here,
 			//so they're drawn on top of pretty much everything
@@ -381,16 +381,17 @@ package
 					_decorations.add(b);
 				}
 			}
-			
-			//Finally actually add the spawner
+
 			if(Spawners)
 			{
+				//Finally actually add the spawner
 				var sp:Spawner = new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_enemies,_enemyBullets,_littleGibs,_player); 
 				_spawners.add(sp);
-				//Then create a dedicated camera to watch the spawner at work
-				_hud.add(new FlxSprite(3 + _spawners.length*16, 3, ImgMiniFrame));
-				var camera:FlxCamera = new FlxCamera(10 + _spawners.length*32,10,24,24,1);
-				camera.goTo(sp.getMidpoint(),1,true);
+				
+				//Then create a dedicated camera to watch the spawner
+				_hud.add(new FlxSprite(3 + (_spawners.length-1)*16, 3, ImgMiniFrame));
+				var camera:FlxCamera = new FlxCamera(10 + (_spawners.length-1)*32,10,24,24,1);
+				camera.follow(sp);
 				FlxG.addCamera(camera);
 			}
 		}

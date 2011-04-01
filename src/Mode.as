@@ -9,7 +9,7 @@ package
 	{
 		public function Mode():void
 		{
-			super(320,240,MenuState);
+			super(320,240,MenuState,2);
 			debugOnRelease = true;
 		}
 	}
