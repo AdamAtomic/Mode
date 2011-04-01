@@ -12,6 +12,7 @@ package
 		[Embed(source="data/countdown.mp3")] protected var SndCount:Class;
 		[Embed(source="data/gibs.png")] private var ImgGibs:Class;
 		[Embed(source="data/spawner_gibs.png")] private var ImgSpawnerGibs:Class;
+		[Embed(source="data/miniframe.png")] private var ImgMiniFrame:Class;
 		
 		//major game object storage
 		protected var _blocks:FlxGroup;
@@ -24,6 +25,7 @@ package
 		protected var _littleGibs:FlxEmitter;
 		protected var _bigGibs:FlxEmitter;
 		protected var _hud:FlxGroup;
+		protected var _gunjam:FlxGroup;
 		
 		//meta groups, to help speed up collisions
 		protected var _objects:FlxGroup;
@@ -34,15 +36,12 @@ package
 		protected var _score2:FlxText;
 		protected var _scoreTimer:Number;
 		protected var _jamTimer:Number;
-		protected var _jamBar:FlxSprite;
-		protected var _jamText:FlxText;
-		protected var _notches:Array;
 		
 		//just to prevent weirdness during level transition
 		protected var _fading:Boolean;
 		
 		override public function create():void
-		{			
+		{
 			FlxG.mouse.hide();
 			
 			//Here we are creating a pool of 100 little metal bits that can be exploded.
@@ -74,12 +73,14 @@ package
 			_player = new Player(316,300,_bullets,_littleGibs);
 
 			//This refers to a custom function down at the bottom of the file
-			//that creates all our level geometry.
+			//that creates all our level geometry with a total size of 640x480.
+			//This in turn calls buildRoom() a bunch of times, which in turn
+			//is responsible for adding the spawners and spawn-cameras.
 			generateLevel();
 			
 			//Add bots and spawners after we add blocks to the state,
-			// so that they're drawn on top of the level, and so that
-			// the bots are drawn on top of both the blocks + the spawners.
+			//so that they're drawn on top of the level, and so that
+			//the bots are drawn on top of both the blocks + the spawners.
 			add(_spawners);
 			add(_littleGibs);
 			add(_bigGibs);
@@ -87,11 +88,11 @@ package
 			add(_decorations);
 			add(_enemies);
 
-			//Then we add the player and set up the scrolling camera
+			//Then we add the player and set up the scrolling camera,
+			//which will automatically set the boundaries of the world.
 			add(_player);
-			FlxG.follow(_player,2.5);
-			FlxG.followAdjust(0.5,0.0);
-			FlxG.followBounds(0,0,640,640);
+			FlxG.camera.setBounds(0,0,640,640,true);
+			FlxG.camera.follow(_player,2.5,0.5,0);
 			
 			//We add the bullets to the scene here,
 			//so they're drawn on top of pretty much everything
@@ -136,30 +137,12 @@ package
 			FlxG.score = 0;
 			_scoreTimer = 0;
 			
-			//Create an Array of sprites with 1 icon for each spawner, like a checklist.
-			_notches = new Array();
-			var tmp:FlxSprite;
-			for(var i:uint = 0; i < 6; i++)
-			{
-				tmp = new FlxSprite(4+i*10,4);
-				tmp.loadGraphic(ImgNotch,true);
-				tmp.addAnimation("on",[0]);
-				tmp.addAnimation("off",[1]);
-				tmp.moves = false;
-				tmp.solid = false;
-				tmp.play("on");
-				_notches.push(tmp);
-				_hud.add(tmp);
-			}
-			
 			//Then we create the "gun jammed" notification
-			_jamBar = new FlxSprite(0,FlxG.height-22).makeGraphic(FlxG.width,24,0xff131c1b);
-			_jamBar.visible = false;
-			_hud.add(_jamBar);
-			_jamText = new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED");
-			_jamText.setFormat(null,16,0xd8eba2,"center");
-			_jamText.visible = false;
-			_hud.add(_jamText);
+			_gunjam = new FlxGroup();
+			_gunjam.add(new FlxSprite(0,FlxG.height-22).makeGraphic(FlxG.width,24,0xff131c1b));
+			_gunjam.add(new FlxText(0,FlxG.height-22,FlxG.width,"GUN IS JAMMED").setFormat(null,16,0xd8eba2,"center"));
+			_gunjam.visible = false;
+			_hud.add(_gunjam);
 			
 			//After we add all the objects to the HUD, we can go through
 			//and set any property we want on all the objects we added
@@ -167,11 +150,15 @@ package
 			//the scroll factors to zero, to make sure the HUD doesn't
 			//wiggle around while we play.
 			_hud.setAll("scrollFactor",new FlxPoint(0,0));
+			_hud.setAll("cameras",[FlxG.camera]);
 			
 			FlxG.playMusic(SndMode);
 			FlxG.flash.start(0xff131c1b);
 			_fading = false;
 			
+			//Debugger Watch examples
+			FlxG.watch(_player,"x");
+			FlxG.watch(_player,"y");
 			FlxG.watch(_enemies,"length","enemies used");
 			FlxG.watch(_enemies.members,"length","enemies capacity");
 		}
@@ -190,6 +177,7 @@ package
 			_littleGibs = null;
 			_bigGibs = null;
 			_hud = null;
+			_gunjam = null;
 			
 			//meta groups, to help speed up collisions
 			_objects = null;
@@ -198,15 +186,12 @@ package
 			//HUD/User Interface stuff
 			_score = null;
 			_score2 = null;
-			_jamBar = null;
-			_jamText = null;
-			_notches = null;
 		}
 
 		override public function update():void
 		{
-			var os:uint = FlxG.score;
-			
+			//save off the current score and update the game state
+			var oldScore:uint = FlxG.score;
 			super.update();
 			
 			//collisions with environment
@@ -214,71 +199,62 @@ package
 			FlxU.overlap(_hazards,_player,overlapped);
 			FlxU.overlap(_bullets,_hazards,overlapped);
 			
+			//check to see if the player scored any points this frame
+			var scoreChanged:Boolean = oldScore != FlxG.score
+			
 			//Jammed message
 			if(FlxG.keys.justPressed("C") && _player.flickering)
 			{
 				_jamTimer = 1;
-				_jamBar.visible = true;
-				_jamText.visible = true;
+				_gunjam.visible = true;
 			}
 			if(_jamTimer > 0)
 			{
-				if(!_player.flickering) _jamTimer = 0;
+				if(!_player.flickering)
+					_jamTimer = 0;
 				_jamTimer -= FlxG.elapsed;
 				if(_jamTimer < 0)
-				{
-					_jamBar.visible = false;
-					_jamText.visible = false;
-				}
+					_gunjam.visible = false;
 			}
 
 			if(!_fading)
 			{
 				//Score + countdown stuffs
-				if(os != FlxG.score) _scoreTimer = 2;
+				if(scoreChanged)
+					_scoreTimer = 2;
 				_scoreTimer -= FlxG.elapsed;
 				if(_scoreTimer < 0)
 				{
 					if(FlxG.score > 0)
 					{
-						FlxG.play(SndCount);
-						if(FlxG.score > 100) FlxG.score -= 100;
-						else { FlxG.score = 0; _player.kill(); }
+						if(FlxG.score > 100)
+							FlxG.score -= 100;
+						else
+						{
+							FlxG.score = 0;
+							_player.kill();
+						}
 						_scoreTimer = 1;
+						scoreChanged = true;
+						
+						//Play loud beeps if your score is low
+						var volume:Number = 0.35;
 						if(FlxG.score < 600)
-							FlxG.play(SndCount);
-						if(FlxG.score < 500)
-							FlxG.play(SndCount);
-						if(FlxG.score < 400)
-							FlxG.play(SndCount);
-						if(FlxG.score < 300)
-							FlxG.play(SndCount);
-						if(FlxG.score < 200)
-							FlxG.play(SndCount);
+							volume = 1.0;
+						FlxG.play(SndCount,volume);
 					}
 				}
 			
 				//Fade out to victory screen stuffs
-				var spawnerCount:int = _spawners.countLiving();
-				if(spawnerCount <= 0)
+				if(_spawners.countLiving() <= 0)
 				{
 					_fading = true;
 					FlxG.fade.start(0xffd8eba2,3,onVictory);
 				}
-				else
-				{
-					for(var i:uint = 0; i < _notches.length; i++)
-					{
-						if(i < spawnerCount)
-							_notches[i].play("on");
-						else
-							_notches[i].play("off");
-					}
-				}
 			}
 			
 			//actually update score text if it changed
-			if(os != FlxG.score)
+			if(scoreChanged)
 			{
 				if(!_player.alive) FlxG.score = 0;
 				_score.text = FlxG.score.toString();
@@ -409,7 +385,15 @@ package
 			
 			//Finally actually add the spawner
 			if(Spawners)
-				_spawners.add(new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_enemies,_enemyBullets,_littleGibs,_player));
+			{
+				var sp:Spawner = new Spawner(RX+sx*8,RY+sy*8,_bigGibs,_enemies,_enemyBullets,_littleGibs,_player); 
+				_spawners.add(sp);
+				//Then create a dedicated camera to watch the spawner at work
+				_hud.add(new FlxSprite(3 + _spawners.length*16, 3, ImgMiniFrame));
+				var camera:FlxCamera = new FlxCamera(10 + _spawners.length*32,10,24,24,1);
+				camera.goTo(sp.getMidpoint(),1,true);
+				FlxG.addCamera(camera);
+			}
 		}
 	}
 }

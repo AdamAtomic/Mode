@@ -135,7 +135,7 @@ package
 				playButton = new FlxButton(flixelButton.x,flixelButton.y + 82,onPlay,"CLICK HERE");
 				playButton.color = flixelButton.color;
 				playButton.label.color = flixelButton.label.color;
-				add(playButton);
+				//add(playButton); //TEMPORARY DEBUG BEHAVIOR
 			}
 
 			//X + C were pressed, fade out and change to play state.
@@ -145,6 +145,7 @@ package
 				attractMode = true;
 			if(!fading && ((FlxG.keys.X && FlxG.keys.C) || attractMode)) 
 			{
+				onFade();	//TEMPORARY DEBUG BEHAVIOR
 				fading = true;
 				FlxG.play(SndHit2);
 				FlxG.flash.start(0xffd8eba2,0.5);
