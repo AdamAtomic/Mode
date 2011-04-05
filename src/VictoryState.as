@@ -23,7 +23,7 @@ package
 			gibs.setYSpeed(0,100);
 			gibs.setRotation(-360,360);
 			gibs.gravity = 80;
-			gibs.makeParticles(ImgGibs,800,32,true,0,0);
+			gibs.makeParticles(ImgGibs,800,32,true,0);
 			add(gibs);
 			gibs.start(false,0,0.005);
 			

@@ -53,7 +53,7 @@ package
 			gibs.setYSpeed(-200,-20);
 			gibs.setRotation(-720,720);
 			gibs.gravity = 100;
-			gibs.makeParticles(ImgGibs,650,32,true,0,0);
+			gibs.makeParticles(ImgGibs,650,32,true,0);
 			add(gibs);
 
 			//the letters "mo"

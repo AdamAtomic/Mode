@@ -30,19 +30,23 @@ package
 		
 		override public function update():void
 		{
-			if(!alive && finished) exists = false;
-			else super.update();
+			if(!alive)
+			{
+				if(finished)
+					exists = false;
+			}
+			else if(touching)
+				kill();
 		}
-
-		override public function hitSide(Contact:FlxObject,Velocity:Number):void { kill(); }
-		override public function hitBottom(Contact:FlxObject,Velocity:Number):void { kill(); }
-		override public function hitTop(Contact:FlxObject,Velocity:Number):void { kill(); }
+		
 		override public function kill():void
 		{
-			if(!alive) return;
+			if(!alive)
+				return;
 			velocity.x = 0;
 			velocity.y = 0;
-			if(onScreen()) FlxG.play(SndHit);
+			if(onScreen())
+				FlxG.play(SndHit);
 			alive = false;
 			solid = false;
 			play("poof");
@@ -55,19 +59,19 @@ package
 			solid = true;
 			switch(Aim)
 			{
-				case FlxSprite.UP:
+				case UP:
 					play("up");
 					velocity.y = -speed;
 					break;
-				case FlxSprite.DOWN:
+				case DOWN:
 					play("down");
 					velocity.y = speed;
 					break;
-				case FlxSprite.LEFT:
+				case LEFT:
 					play("left");
 					velocity.x = -speed;
 					break;
-				case FlxSprite.RIGHT:
+				case RIGHT:
 					play("right");
 					velocity.x = speed;
 					break;

@@ -74,6 +74,10 @@ package
 				return;
 			}
 			
+			//make a little noise if you just touched the floor
+			if(justTouched(FLOOR) && (velocity.y > 50))
+				FlxG.play(SndLand);
+			
 			//MOVEMENT
 			acceleration.x = 0;
 			if(FlxG.keys.LEFT)
@@ -119,31 +123,18 @@ package
 			}
 			
 			//SHOOTING
-			if(!flickering && FlxG.keys.justPressed("C"))
+			if(FlxG.keys.justPressed("C"))
 			{
-				getMidpoint(_point);
-				(_bullets.recycle(Bullet) as Bullet).shoot(_point,_aim);
-				if(_aim == DOWN)
-					velocity.y -= 36;
-			}
-				
-			//UPDATE POSITION AND ANIMATION
-			super.update();
-
-			//Jammed, can't fire!
-			if(flickering)
-			{
-				if(FlxG.keys.justPressed("C"))
+				if(flickering)
 					FlxG.play(SndJam);
+				else
+				{
+					getMidpoint(_point);
+					(_bullets.recycle(Bullet) as Bullet).shoot(_point,_aim);
+					if(_aim == DOWN)
+						velocity.y -= 36;
+				}
 			}
-		}
-		
-		override public function hitBottom(Contact:FlxObject,Velocity:Number):void
-		{
-			if(velocity.y > 50)
-				FlxG.play(SndLand);
-			onFloor = true;
-			return super.hitBottom(Contact,Velocity);
 		}
 		
 		override public function hurt(Damage:Number):void
@@ -172,6 +163,7 @@ package
 			flicker(0);
 			exists = true;
 			visible = false;
+			velocity.make();
 			FlxG.camera.shake(0.005,0.35);
 			FlxG.camera.flash(0xffd8eba2,0.35);
 			if(_gibs != null)

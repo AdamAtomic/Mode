@@ -41,7 +41,7 @@ package
 		
 		override public function create():void
 		{
-			//FlxG.mouse.hide();
+			FlxG.mouse.hide();
 			
 			//Here we are creating a pool of 100 little metal bits that can be exploded.
 			//We will recycle the crap out of these!
@@ -49,14 +49,18 @@ package
 			_littleGibs.setXSpeed(-150,150);
 			_littleGibs.setYSpeed(-200,0);
 			_littleGibs.setRotation(-720,-720);
-			_littleGibs.makeParticles(ImgGibs,100,10,true,0.5,0.5);
+			_littleGibs.gravity = 350;
+			_littleGibs.bounce = 0.5;
+			_littleGibs.makeParticles(ImgGibs,100,10,true,0.5);
 			
 			//Next we create a smaller pool of larger metal bits for exploding.
 			_bigGibs = new FlxEmitter();
 			_bigGibs.setXSpeed(-200,200);
 			_bigGibs.setYSpeed(-300,0);
 			_bigGibs.setRotation(-720,-720);
-			_bigGibs.makeParticles(ImgSpawnerGibs,50,20,true);
+			_bigGibs.gravity = 350;
+			_bigGibs.bounce = 0.35;
+			_bigGibs.makeParticles(ImgSpawnerGibs,50,20,true,0.5);
 			
 			//Then we'll set up the rest of our object groups or pools
 			_blocks = new FlxGroup();
@@ -189,14 +193,17 @@ package
 
 		override public function update():void
 		{
+			if(FlxG.keys.justPressed("SPACE"))
+				FlxG.cameras[3].visible = !FlxG.cameras[3].visible;
+			
 			//save off the current score and update the game state
 			var oldScore:uint = FlxG.score;
 			super.update();
 			
 			//collisions with environment
-			FlxU.collide(_blocks,_objects);
-			FlxU.overlap(_hazards,_player,overlapped);
-			FlxU.overlap(_bullets,_hazards,overlapped);
+			collide(_blocks,_objects);
+			overlap(_hazards,_player,overlapped);
+			overlap(_bullets,_hazards,overlapped);
 			
 			//check to see if the player scored any points this frame
 			var scoreChanged:Boolean = oldScore != FlxG.score

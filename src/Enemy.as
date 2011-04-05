@@ -54,8 +54,7 @@ package
 			// that shoot out the back of the ship.
 			_jets = new FlxEmitter();
 			_jets.setRotation();
-			_jets.gravity = 0;
-			_jets.makeParticles(ImgJet,15,0,false,0,0);
+			_jets.makeParticles(ImgJet,15,0,false,0);
 			
 			//These parameters help control the ship's
 			//speed and direction during the update() loop.

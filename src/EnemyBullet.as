@@ -21,21 +21,23 @@ package
 		
 		override public function update():void
 		{
-			if(!alive && finished)
-				exists = false;
-			else
-				super.update();
+			if(!alive)
+			{
+				if(finished)
+					exists = false;
+			}
+			else if(touching)
+				kill();
 		}
-
-		override public function hitSide(Contact:FlxObject,Velocity:Number):void { kill(); }
-		override public function hitBottom(Contact:FlxObject,Velocity:Number):void { kill(); }
-		override public function hitTop(Contact:FlxObject,Velocity:Number):void { kill(); }
+		
 		override public function kill():void
 		{
-			if(!alive) return;
+			if(!alive)
+				return;
 			velocity.x = 0;
 			velocity.y = 0;
-			if(onScreen()) FlxG.play(SndHit);
+			if(onScreen())
+				FlxG.play(SndHit);
 			alive = false;
 			solid = false;
 			play("poof");
