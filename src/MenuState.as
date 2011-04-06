@@ -17,7 +17,7 @@ package
 		[Embed(source="data/attract2.fgr",mimeType="application/octet-stream")] public var Attract2:Class;
 		
 		public var gibs:FlxEmitter;
-		public var playButton:FlxButton
+		public var playButton:FlxButton;
 		public var title1:FlxText;
 		public var title2:FlxText;
 		public var fading:Boolean;

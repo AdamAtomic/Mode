@@ -120,7 +120,7 @@ package
 			//From here on out we are making objects for the HUD,
 			//that is, the player score, number of spawners left, etc.
 			//First, we'll create a text field for the current score
-			_score = new FlxText(0,0,FlxG.width);
+			_score = new FlxText(FlxG.width/4,0,FlxG.width/2);
 			_score.setFormat(null,16,0xd8eba2,"center",0x131c1b);
 			_hud.add(_score);
 			if(FlxG.scores.length < 2)
@@ -130,13 +130,15 @@ package
 			}
 			
 			//Then for the player's highest and last scores
-			_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2);
-			_score2.setFormat(null,8,0xd8eba2,"right",_score.shadow);
-			_hud.add(_score2);
 			if(FlxG.score > FlxG.scores[0])
 				FlxG.scores[0] = FlxG.score;
 			if(FlxG.scores[0] != 0)
+			{
+				_score2 = new FlxText(FlxG.width/2,0,FlxG.width/2);
+				_score2.setFormat(null,8,0xd8eba2,"right",_score.shadow);
+				_hud.add(_score2);
 				_score2.text = "HIGHEST: "+FlxG.scores[0]+"\nLAST: "+FlxG.score;
+			}
 			FlxG.score = 0;
 			_scoreTimer = 0;
 			
@@ -162,8 +164,7 @@ package
 			//Debugger Watch examples
 			FlxG.watch(_player,"x");
 			FlxG.watch(_player,"y");
-			FlxG.watch(_enemies,"length","enemies used");
-			FlxG.watch(_enemies.members,"length","enemies capacity");
+			FlxG.watch(FlxG,"score");
 		}
 		
 		override public function destroy():void
@@ -192,10 +193,7 @@ package
 		}
 
 		override public function update():void
-		{
-			if(FlxG.keys.justPressed("SPACE"))
-				FlxG.cameras[3].visible = !FlxG.cameras[3].visible;
-			
+		{			
 			//save off the current score and update the game state
 			var oldScore:uint = FlxG.score;
 			super.update();

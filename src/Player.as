@@ -164,6 +164,7 @@ package
 			exists = true;
 			visible = false;
 			velocity.make();
+			acceleration.make();
 			FlxG.camera.shake(0.005,0.35);
 			FlxG.camera.flash(0xffd8eba2,0.35);
 			if(_gibs != null)
