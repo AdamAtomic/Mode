@@ -7,6 +7,7 @@ package
 	public class MenuState extends FlxState
 	{
 		//Some graphics and sounds
+		[Embed(source="data/bot.png")] protected var ImgEnemy:Class;
 		[Embed(source="data/spawner_gibs.png")] public var ImgGibs:Class;
 		[Embed(source="data/cursor.png")] public var ImgCursor:Class;
 		[Embed(source="data/menu_hit.mp3")] public var SndHit:Class;
@@ -79,7 +80,7 @@ package
 			timer = 0;
 			attractMode = false;
 			
-			pathFollower = new FlxSprite(-20,-20);
+			pathFollower = new FlxSprite(-20,-20,ImgEnemy);
 			testPath = new FlxPath();
 			add(pathFollower);
 			
@@ -97,7 +98,7 @@ package
 
 		override public function update():void
 		{
-			if(FlxG.mouse.justPressed() && FlxG.keys.SHIFT)
+			if(FlxG.mouse.justPressed() && FlxG.keys.SPACE)
 			{
 				timer = 0;
 				testPath.addPoint(FlxG.mouse);
