@@ -24,6 +24,9 @@ package
 		public var timer:Number;
 		public var attractMode:Boolean;
 		
+		public var pathFollower:FlxSprite;
+		public var testPath:FlxPath;
+		
 		override public function create():void
 		{
 			//the default settings are 60/30, but Mode has a lot of collisions and fast action,
@@ -76,6 +79,10 @@ package
 			timer = 0;
 			attractMode = false;
 			
+			pathFollower = new FlxSprite(-20,-20);
+			testPath = new FlxPath();
+			add(pathFollower);
+			
 			FlxG.mouse.show(ImgCursor,2);
 		}
 		
@@ -90,6 +97,14 @@ package
 
 		override public function update():void
 		{
+			if(FlxG.mouse.justPressed() && FlxG.keys.SHIFT)
+			{
+				timer = 0;
+				testPath.addPoint(FlxG.mouse);
+				if(pathFollower.path == null)
+					pathFollower.followPath(testPath,100,FlxObject.PATH_LOOP_FORWARD,true);
+			}
+			
 			super.update();
 			
 			if(title2.x > title1.x + title1.width - 4)
@@ -142,7 +157,7 @@ package
 			//X + C were pressed, fade out and change to play state.
 			//OR, if we sat on the menu too long, launch the attract mode instead!
 			timer += FlxG.elapsed;
-			if(timer >= 10) //go into demo mode if no buttons are pressed for 10 seconds
+			if(timer >= 8) //go into demo mode if no buttons are pressed for 10 seconds
 				attractMode = true;
 			if(!fading && ((FlxG.keys.X && FlxG.keys.C) || attractMode)) 
 			{
