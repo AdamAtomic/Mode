@@ -9,8 +9,8 @@ package
 	{
 		public function Mode():void
 		{
-			super(320,240,MenuState,2);
-			debugOnRelease = true;
+			super(320,240,MenuState,2,50,50);
+			forceDebugger = true;
 		}
 	}
 }

@@ -30,11 +30,6 @@ package
 		
 		override public function create():void
 		{
-			//the default settings are 60/30, but Mode has a lot of collisions and fast action,
-			//so we are turning down the engine framerate a bit,
-			//and turning up the flash player framerate a bit.
-			FlxG.framerate = 50;
-			FlxG.flashFramerate = 50;
 			FlxG.bgColor = 0xff131c1b;
 			
 			//Simple use of flixel save game object.

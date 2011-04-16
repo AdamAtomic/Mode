@@ -199,9 +199,9 @@ package
 			super.update();
 			
 			//collisions with environment
-			collide(_blocks,_objects);
-			overlap(_hazards,_player,overlapped);
-			overlap(_bullets,_hazards,overlapped);
+			FlxG.collide(_blocks,_objects);
+			FlxG.overlap(_hazards,_player,overlapped);
+			FlxG.overlap(_bullets,_hazards,overlapped);
 			
 			//check to see if the player scored any points this frame
 			var scoreChanged:Boolean = oldScore != FlxG.score
