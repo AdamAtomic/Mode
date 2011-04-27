@@ -38,17 +38,13 @@ package
 		public function Enemy()
 		{
 			super();
-			loadRotatedGraphic(ImgBot,64,0);
+			loadRotatedGraphic(ImgBot,64,0,false,true);
 
 			//We want the enemy's "hit box" or actual size to be
 			//smaller than the enemy graphic itself, just by a few pixels.
 			width = 12;
 			height = 12;
-			
-			//Since the graphic is 16x16, and the hit box is 12x12,
-			//we want to scootch everything over by 2 pixels (16-12 = 4, 4/2 = 2).
-			offset.x = 2;
-			offset.y = 2;
+			centerOffsets();
 			
 			//Here we are setting up the jet particles
 			// that shoot out the back of the ship.

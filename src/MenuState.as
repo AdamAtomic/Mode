@@ -1,8 +1,10 @@
 package
 {
+	import flash.geom.Rectangle;
 	import flash.net.SharedObject;
 	
 	import org.flixel.*;
+	import org.flixel.plugin.DebugPathDisplay;
 
 	public class MenuState extends FlxState
 	{
@@ -75,9 +77,10 @@ package
 			timer = 0;
 			attractMode = false;
 			
+			/*silly path following test
 			pathFollower = new FlxSprite(-20,-20,ImgEnemy);
 			testPath = new FlxPath();
-			add(pathFollower);
+			add(pathFollower);//*/
 			
 			FlxG.mouse.show(ImgCursor,2);
 		}
@@ -89,17 +92,21 @@ package
 			playButton = null;
 			title1 = null;
 			title2 = null;
+			
+			/*silly path following test
+			testPath.destroy();//*/
 		}
 
 		override public function update():void
 		{
+			/*silly path following test code
 			if(FlxG.mouse.justPressed() && FlxG.keys.SPACE)
 			{
 				timer = 0;
 				testPath.addPoint(FlxG.mouse);
 				if(pathFollower.path == null)
 					pathFollower.followPath(testPath,100,FlxObject.PATH_LOOP_FORWARD,true);
-			}
+			}//*/
 			
 			super.update();
 			
@@ -129,12 +136,12 @@ package
 				text.color = 0x3a5c39;
 				add(text);
 				
-				var flixelButton:FlxButton = new FlxButton(FlxG.width/2-40,FlxG.height/3+54,onFlixel,"flixel.org");
+				var flixelButton:FlxButton = new FlxButton(FlxG.width/2-40,FlxG.height/3+54,"flixel.org",onFlixel);
 				flixelButton.color = 0xff729954;
 				flixelButton.label.color = 0xffd8eba2;
 				add(flixelButton);
 				
-				var dannyButton:FlxButton = new FlxButton(flixelButton.x,flixelButton.y + 22,onDanny,"music: dannyB");
+				var dannyButton:FlxButton = new FlxButton(flixelButton.x,flixelButton.y + 22,"music: dannyB",onDanny);
 				dannyButton.color = flixelButton.color;
 				dannyButton.label.color = flixelButton.label.color;
 				add(dannyButton);
@@ -144,7 +151,7 @@ package
 				text.alignment = "center";
 				add(text);
 				
-				playButton = new FlxButton(flixelButton.x,flixelButton.y + 82,onPlay,"CLICK HERE");
+				playButton = new FlxButton(flixelButton.x,flixelButton.y + 82,"CLICK HERE",onPlay);
 				playButton.color = flixelButton.color;
 				playButton.label.color = flixelButton.label.color;
 				add(playButton);
@@ -153,7 +160,7 @@ package
 			//X + C were pressed, fade out and change to play state.
 			//OR, if we sat on the menu too long, launch the attract mode instead!
 			timer += FlxG.elapsed;
-			if(timer >= 8) //go into demo mode if no buttons are pressed for 10 seconds
+			if(timer >= 10) //go into demo mode if no buttons are pressed for 10 seconds
 				attractMode = true;
 			if(!fading && ((FlxG.keys.X && FlxG.keys.C) || attractMode)) 
 			{
